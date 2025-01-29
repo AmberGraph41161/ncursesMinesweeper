@@ -23,7 +23,7 @@ int RANDOM(int minimum, int maximum)
 	return (rand() % (maximum - minimum + 1)) + minimum;
 }
 
-void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, int boardMines, BoardCharSet boardCharSet)
+void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, int boardMines, BoardCharSet &boardCharSet)
 {
 	for(int y = 0; y < boardHeight; y++)
 	{
@@ -45,7 +45,7 @@ void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight
 	}
 }
 
-void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet boardCharSet)
+void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet)
 {
 	for(int y = 0; y < board.size(); y++)
 	{
@@ -139,13 +139,43 @@ void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet 
 
 			if(tempMineCount > 0)
 			{
-				board[y][x].actualChar = tempMineCount + 48; //char 48 == '0' ascii
+				board[y][x].actualChar = tempMineCount + '0';
 			}
 		}
 	}
 }
 
-void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
+void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet, bool revealWholeBoard = false)
+{
+	//https://en.wikipedia.org/wiki/Flood_fill
+	if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
+	{
+		return;
+	}
+	
+	if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar)
+	{
+		return;
+	}
+
+	if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar)
+	{
+		board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
+	} else
+	{
+		return;
+	}
+
+	if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9') || revealWholeBoard)
+	{
+		clearBoardWhereClicked(board, clickedY, clickedX + 1, boardCharSet);
+		clearBoardWhereClicked(board, clickedY, clickedX - 1, boardCharSet);
+		clearBoardWhereClicked(board, clickedY + 1, clickedX, boardCharSet);
+		clearBoardWhereClicked(board, clickedY - 1, clickedX, boardCharSet);
+	}
+}
+
+void clearBoardWhereClickedOld(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
 {
 	//function assumes that where you clicked was a 'safe location' (not a mine)
 
