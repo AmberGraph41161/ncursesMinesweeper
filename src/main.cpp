@@ -13,7 +13,7 @@ struct BoardCharSet
 
 struct BoardCell
 {
-	char displayChar = '!';
+	char displayChar = '@';
 	char actualChar = '!';
 	bool cellClicked = false;
 };
@@ -145,6 +145,125 @@ void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet 
 	}
 }
 
+void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
+{
+	//function assumes that where you clicked was a 'safe location' (not a mine)
+
+	if(clickedY >= board.size() || clickedX >= board[0].size())
+	{
+		return;
+	}
+
+	int up;
+	bool keepGoingUp;
+	int down;
+	bool keepGoingDown;
+
+	//right (includes 'middle'
+	int right = 0;
+	while(clickedX + right < board[0].size())
+	{
+		up = 0;
+		down = 0;
+		keepGoingUp = true;
+		keepGoingDown = true;
+
+		while(keepGoingUp || keepGoingDown)
+		{
+			if(clickedY + up < board.size())
+			{
+				if(board[clickedY + up][clickedX + right].actualChar != boardCharSet.mineChar)
+				{
+					board[clickedY + up][clickedX + right].displayChar = board[clickedY + up][clickedX + right].actualChar;
+					up++;
+				} else
+				{
+					keepGoingUp = false;
+				}
+			} else
+			{
+				keepGoingUp = false;
+			}
+			if(clickedY - down >= 0)
+			{
+				if(board[clickedY - down][clickedX + right].actualChar != boardCharSet.mineChar)
+				{
+					board[clickedY - down][clickedX + right].displayChar = board[clickedY - down][clickedX + right].actualChar;
+					down++;
+				} else
+				{
+					keepGoingDown = false;
+				}
+			} else
+			{
+				keepGoingDown = false;
+			}
+		}
+		right++;
+
+		if(clickedX + right < board[0].size())
+		{
+			if(board[clickedY][clickedX + right].actualChar == boardCharSet.mineChar)
+			{
+				break;
+			}
+		}
+	}
+
+	//left
+	int left = 0;
+	while(clickedX - left > 0)
+	{
+		up = 0;
+		down = 0;
+		keepGoingUp = true;
+		keepGoingDown = true;
+
+		while(keepGoingUp || keepGoingDown)
+		{
+			if(clickedY + up < board.size())
+			{
+				if(board[clickedY + up][clickedX - left].actualChar != boardCharSet.mineChar)
+				{
+					board[clickedY + up][clickedX - left].displayChar = board[clickedY + up][clickedX - left].actualChar;
+					up++;
+				} else
+				{
+					keepGoingUp = false;
+				}
+			} else
+			{
+				keepGoingUp = false;
+			}
+
+			if(clickedY - down >= 0)
+			{
+				if(board[clickedY - down][clickedX - left].actualChar != boardCharSet.mineChar)
+				{
+					board[clickedY - down][clickedX - left].displayChar = board[clickedY - down][clickedX - left].actualChar;
+					down++;
+				} else
+				{
+					keepGoingDown = false;
+				}
+			} else
+			{
+				keepGoingDown = false;
+			}
+
+		}
+		left++;
+
+		if(clickedX - left > 0)
+		{
+			if(board[clickedY][clickedX - left].actualChar == boardCharSet.mineChar)
+			{
+				break;
+			}
+		}
+	}
+}
+
 int main()
 {
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
@@ -211,6 +330,7 @@ int main()
 				mvprintw(0, 0, "x: %d", mouseEvent.x);
 				mvprintw(1, 0, "y: %d", mouseEvent.y);
 
+				/*
 				for(int y = 0; y < board.size(); y++)
 				{
 					for(int x = 0; x < board[y].size(); x++)
@@ -218,7 +338,15 @@ int main()
 						mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].actualChar);
 					}
 				}
-				break;
+				*/
+				clearBoardWhereClicked(board, mouseEvent.y - boardTopPadding, mouseEvent.x - boardLeftPadding, boardCharSet);
+				for(int y = 0; y < board.size(); y++)
+				{
+					for(int x = 0; x < board[y].size(); x++)
+					{
+						mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+					}
+				}
 			}
 		}
 
