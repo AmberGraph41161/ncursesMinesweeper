@@ -45,6 +45,106 @@ void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight
 	}
 }
 
+void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet boardCharSet)
+{
+	for(int y = 0; y < board.size(); y++)
+	{
+		for(int x = 0; x < board[y].size(); x++)
+		{
+			int tempMineCount = 0;
+
+			if(board[y][x].actualChar != boardCharSet.mineChar)
+			{
+				//!##
+				//#@#
+				//###
+				if(y - 1 >= 0 && x - 1 >= 0)
+				{
+					if(board[y - 1][x - 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//#!#
+				//#@#
+				//###
+				if(y - 1 >= 0)
+				{
+					if(board[y - 1][x].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//##!
+				//#@#
+				//###
+				if(y - 1 >= 0 && x + 1 < board[0].size())
+				{
+					if(board[y - 1][x + 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//###
+				//!@#
+				//###
+				if(x - 1 >= 0)
+				{
+					if(board[y][x - 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//###
+				//#@!
+				//###
+				if(x + 1 < board[0].size())
+				{
+					if(board[y][x + 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//###
+				//#@#
+				//!##
+				if(y + 1 < board.size() && x - 1 >= 0)
+				{
+					if(board[y + 1][x - 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//###
+				//#@#
+				//#!#
+				if(y + 1 < board.size())
+				{
+					if(board[y + 1][x].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+				//###
+				//#@#
+				//##!
+				if(y + 1 < board.size() && x + 1 < board[0].size())
+				{
+					if(board[y + 1][x + 1].actualChar == boardCharSet.mineChar)
+					{
+						tempMineCount++;
+					}
+				}
+			}
+
+			if(tempMineCount > 0)
+			{
+				board[y][x].actualChar = tempMineCount + 48; //char 48 == '0' ascii
+			}
+		}
+	}
+}
+
 int main()
 {
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
@@ -91,6 +191,7 @@ int main()
 	BoardCharSet boardCharSet;
 	std::vector<std::vector<BoardCell>> board;
 	initializeBoard(board, mediumBoardHeight, mediumBoardWidth, mediumBoardMines, boardCharSet);
+	initializeNumbers(board, boardCharSet);
 
 	while(true)
 	{
