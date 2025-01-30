@@ -157,7 +157,7 @@ namespace Mines
 			return;
 		}
 
-		if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar)
+		if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar && board[clickedY][clickedX].displayChar != boardCharSet.flagChar)
 		{
 			board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
 		} else
@@ -294,6 +294,26 @@ namespace Mines
 					break;
 				}
 			}
+		}
+	}
+
+	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
+	{
+	
+		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
+		{
+			return;
+		}
+		
+		if(board[clickedY][clickedX].displayChar == boardCharSet.filledChar)
+		{
+			board[clickedY][clickedX].displayChar = boardCharSet.flagChar;
+		} else if(board[clickedY][clickedX].displayChar == boardCharSet.flagChar)
+		{
+			board[clickedY][clickedX].displayChar = boardCharSet.filledChar;
+		} else
+		{
+			return;
 		}
 	}
 }

@@ -10,12 +10,13 @@ namespace Mines
 		char mineChar = '*';
 		char blankChar = ' ';
 		char filledChar = '#';
+		char flagChar = '!';
 	};
 
 	struct BoardCell
 	{
 		char displayChar = '#';
-		char actualChar = '!';
+		char actualChar = '_';
 		bool cellClicked = false;
 	};
 
@@ -25,6 +26,7 @@ namespace Mines
 	void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet);
 	void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet, bool revealWholeBoard = false);
 	void clearBoardWhereClickedDEPRECATED(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet);
+	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet);
 }
 
 #endif

@@ -33,7 +33,7 @@ int main()
 	keypad(stdscr, true); //allows arrow keys and function keys and mouse events
 	noecho();
 
-	mousemask(BUTTON1_CLICKED, NULL);
+	mousemask(BUTTON1_CLICKED | BUTTON3_CLICKED, NULL);
 	MEVENT mouseEvent;
 	int clickedX = 0;
 	int clickedY = 0;
@@ -120,10 +120,11 @@ int main()
 		input = getch();
 		if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
 		{
+			clickedX = mouseEvent.x;
+			clickedY = mouseEvent.y;
+
 			if(mouseEvent.bstate &BUTTON1_CLICKED)
 			{
-				clickedX = mouseEvent.x;
-				clickedY = mouseEvent.y;
 
 				//mvprintw(0, 0, "x: %d", clickedX);
 				//mvprintw(1, 0, "y: %d", clickedY);
@@ -136,6 +137,9 @@ int main()
 				}
 
 				Mines::clearBoardWhereClicked(board, clickedY - boardTopPadding, clickedX - boardLeftPadding, boardCharSet);
+			} else if(mouseEvent.bstate &BUTTON3_CLICKED)
+			{
+				Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 			}
 		}
 
