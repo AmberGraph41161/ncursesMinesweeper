@@ -316,4 +316,233 @@ namespace Mines
 			return;
 		}
 	}
+
+	bool numberOfFlagsAroundNumberCellMatch(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
+	{
+		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
+		{
+			return false;
+		}
+
+		if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9'))
+		{
+			return false;
+		}
+
+		int numberOfFlagsAroundCell = 0;
+
+		//!##
+		//#@#
+		//###
+		if(clickedY - 1 >= 0 && clickedX - 1 >= 0)
+		{
+			if(board[clickedY - 1][clickedX - 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//#!#
+		//#@#
+		//###
+		if(clickedY - 1 >= 0)
+		{
+			if(board[clickedY - 1][clickedX].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//##!
+		//#@#
+		//###
+		if(clickedY - 1 >= 0 && clickedX + 1 < board[0].size())
+		{
+			if(board[clickedY - 1][clickedX + 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//###
+		//!@#
+		//###
+		if(clickedX - 1 >= 0) 
+		{
+			if(board[clickedY][clickedX - 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//###
+		//#@!
+		//###
+		if(clickedX + 1 < board[0].size()) 
+		{
+			if(board[clickedY][clickedX + 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//###
+		//#@#
+		//!##
+		if(clickedY + 1 < board.size() && clickedX - 1 >= 0)
+		{
+			if(board[clickedY + 1][clickedX - 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//###
+		//#@#
+		//#!#
+		if(clickedY + 1 < board.size())
+		{
+			if(board[clickedY + 1][clickedX].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+		//###
+		//#@#
+		//##!
+		if(clickedY + 1 < board.size() && clickedX + 1 < board[0].size())
+		{
+			if(board[clickedY + 1][clickedX + 1].displayChar == boardCharSet.flagChar)
+			{
+				numberOfFlagsAroundCell++;
+			}
+		}
+
+		return (board[clickedY][clickedX].actualChar - '0' == numberOfFlagsAroundCell);
+	}
+
+	bool numberOfFlagsClearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
+	{
+		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
+		{
+			return false;
+		}
+
+		if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9'))
+		{
+			return false;
+		}
+
+		bool hitMine = false;
+
+		//!##
+		//#@#
+		//###
+		if(clickedY - 1 >= 0 && clickedX - 1 >= 0)
+		{
+			if(board[clickedY - 1][clickedX - 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY - 1][clickedX - 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY - 1][clickedX - 1].displayChar = board[clickedY - 1][clickedX - 1].actualChar;
+			}
+		}
+		//#!#
+		//#@#
+		//###
+		if(clickedY - 1 >= 0)
+		{
+			if(board[clickedY - 1][clickedX].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY - 1][clickedX].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY - 1][clickedX].displayChar = board[clickedY - 1][clickedX].actualChar;
+			}
+		}
+		//##!
+		//#@#
+		//###
+		if(clickedY - 1 >= 0 && clickedX + 1 < board[0].size())
+		{
+			if(board[clickedY - 1][clickedX + 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY - 1][clickedX + 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY - 1][clickedX + 1].displayChar = board[clickedY - 1][clickedX + 1].actualChar;
+			}
+		}
+		//###
+		//!@#
+		//###
+		if(clickedX - 1 >= 0) 
+		{
+			if(board[clickedY][clickedX - 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY][clickedX - 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY][clickedX - 1].displayChar = board[clickedY][clickedX - 1].actualChar;
+			}
+		}
+		//###
+		//#@!
+		//###
+		if(clickedX + 1 < board[0].size()) 
+		{
+			if(board[clickedY][clickedX + 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY][clickedX + 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY][clickedX + 1].displayChar = board[clickedY][clickedX + 1].actualChar;
+			}
+		}
+		//###
+		//#@#
+		//!##
+		if(clickedY + 1 < board.size() && clickedX - 1 >= 0)
+		{
+			if(board[clickedY + 1][clickedX - 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY + 1][clickedX - 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY + 1][clickedX - 1].displayChar = board[clickedY + 1][clickedX - 1].actualChar;
+			}
+		}
+		//###
+		//#@#
+		//#!#
+		if(clickedY + 1 < board.size())
+		{
+			if(board[clickedY + 1][clickedX].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY + 1][clickedX].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY + 1][clickedX].displayChar = board[clickedY + 1][clickedX].actualChar;
+			}
+		}
+		//###
+		//#@#
+		//##!
+		if(clickedY + 1 < board.size() && clickedX + 1 < board[0].size())
+		{
+			if(board[clickedY + 1][clickedX + 1].displayChar != boardCharSet.flagChar)
+			{
+				if(board[clickedY + 1][clickedX + 1].actualChar == boardCharSet.mineChar)
+				{
+					hitMine = true;
+				}
+				board[clickedY + 1][clickedX + 1].displayChar = board[clickedY + 1][clickedX + 1].actualChar;
+			}
+		}
+
+		return !hitMine;
+	}
+
 }

@@ -120,8 +120,8 @@ int main()
 		input = getch();
 		if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
 		{
-			clickedX = mouseEvent.x;
-			clickedY = mouseEvent.y;
+			clickedY = mouseEvent.y - boardTopPadding;
+			clickedX = mouseEvent.x - boardLeftPadding;
 
 			if(mouseEvent.bstate &BUTTON1_CLICKED)
 			{
@@ -136,7 +136,20 @@ int main()
 					haveNotInitializedMinesYet = false;
 				}
 
-				Mines::clearBoardWhereClicked(board, clickedY - boardTopPadding, clickedX - boardLeftPadding, boardCharSet);
+				if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
+				&& board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9')
+				{
+					if(Mines::numberOfFlagsAroundNumberCellMatch(board, clickedY, clickedX, boardCharSet))
+					{
+						if(!Mines::numberOfFlagsClearBoardWhereClicked(board, clickedY, clickedX, boardCharSet))
+						{
+							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+						}
+					}
+				} else
+				{
+					Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+				}
 			} else if(mouseEvent.bstate &BUTTON3_CLICKED)
 			{
 				Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);

@@ -27,6 +27,8 @@ namespace Mines
 	void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet, bool revealWholeBoard = false);
 	void clearBoardWhereClickedDEPRECATED(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet);
 	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet);
+	bool numberOfFlagsAroundNumberCellMatch(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet);
+	bool numberOfFlagsClearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet);
 }
 
 #endif
