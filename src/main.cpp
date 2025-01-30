@@ -1,298 +1,28 @@
 #include <iostream>
 #include <chrono>
-#include <vector>
 #include <cstdlib>
 #include <ncurses.h>
 
-struct BoardCharSet
-{
-	char mineChar = '*';
-	char blankChar = ' ';
-	char filledChar = '@';
-};
+#include "minesweeper.hpp"
 
-struct BoardCell
-{
-	char displayChar = '@';
-	char actualChar = '!';
-	bool cellClicked = false;
-};
+//https://www.youtube.com/watch?v=YyyhQ0B3huo
+#define CUSTOM_COLOR_ONE 21
+#define CUSTOM_COLOR_TWO 22
+#define CUSTOM_COLOR_THREE 23
+#define CUSTOM_COLOR_FOUR 24
+#define CUSTOM_COLOR_FIVE 25
+#define CUSTOM_COLOR_SIX 26
+#define CUSTOM_COLOR_SEVEN 27
+#define CUSTOM_COLOR_EIGHT 28
+#define CUSTOM_COLOR_NINE 29
 
-int RANDOM(int minimum, int maximum)
-{
-	return (rand() % (maximum - minimum + 1)) + minimum;
-}
+/*
+init_color(COLOR_RED, 700, 0, 0);
+//param 1     : color name
+//param 2, 3, 4 : rgb content min = 0, max = 1000
 
-void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, int boardMines, BoardCharSet &boardCharSet)
-{
-	for(int y = 0; y < boardHeight; y++)
-	{
-		std::vector<BoardCell> tempRow;
-		for(int x = 0; x < boardWidth; x++)
-		{
-			BoardCell tempBoardCell;
-			tempBoardCell.actualChar = boardCharSet.blankChar;
-			tempRow.push_back(tempBoardCell);
-		}
-		board.push_back(tempRow);
-	}
-
-	for(int x = 0; x < boardMines - 1; x++)
-	{
-		BoardCell tempBoardCell;
-		tempBoardCell.actualChar = boardCharSet.mineChar;
-		board[RANDOM(0, boardHeight - 1)][RANDOM(0, boardWidth - 1)] = tempBoardCell;
-	}
-}
-
-void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet)
-{
-	for(int y = 0; y < board.size(); y++)
-	{
-		for(int x = 0; x < board[y].size(); x++)
-		{
-			int tempMineCount = 0;
-
-			if(board[y][x].actualChar != boardCharSet.mineChar)
-			{
-				//!##
-				//#@#
-				//###
-				if(y - 1 >= 0 && x - 1 >= 0)
-				{
-					if(board[y - 1][x - 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//#!#
-				//#@#
-				//###
-				if(y - 1 >= 0)
-				{
-					if(board[y - 1][x].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//##!
-				//#@#
-				//###
-				if(y - 1 >= 0 && x + 1 < board[0].size())
-				{
-					if(board[y - 1][x + 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//###
-				//!@#
-				//###
-				if(x - 1 >= 0)
-				{
-					if(board[y][x - 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//###
-				//#@!
-				//###
-				if(x + 1 < board[0].size())
-				{
-					if(board[y][x + 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//###
-				//#@#
-				//!##
-				if(y + 1 < board.size() && x - 1 >= 0)
-				{
-					if(board[y + 1][x - 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//###
-				//#@#
-				//#!#
-				if(y + 1 < board.size())
-				{
-					if(board[y + 1][x].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-				//###
-				//#@#
-				//##!
-				if(y + 1 < board.size() && x + 1 < board[0].size())
-				{
-					if(board[y + 1][x + 1].actualChar == boardCharSet.mineChar)
-					{
-						tempMineCount++;
-					}
-				}
-			}
-
-			if(tempMineCount > 0)
-			{
-				board[y][x].actualChar = tempMineCount + '0';
-			}
-		}
-	}
-}
-
-void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet, bool revealWholeBoard = false)
-{
-	//https://en.wikipedia.org/wiki/Flood_fill
-	if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
-	{
-		return;
-	}
-	
-	if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar)
-	{
-		return;
-	}
-
-	if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar)
-	{
-		board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
-	} else
-	{
-		return;
-	}
-
-	if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9') || revealWholeBoard)
-	{
-		clearBoardWhereClicked(board, clickedY, clickedX + 1, boardCharSet);
-		clearBoardWhereClicked(board, clickedY, clickedX - 1, boardCharSet);
-		clearBoardWhereClicked(board, clickedY + 1, clickedX, boardCharSet);
-		clearBoardWhereClicked(board, clickedY - 1, clickedX, boardCharSet);
-	}
-}
-
-void clearBoardWhereClickedOld(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
-{
-	//function assumes that where you clicked was a 'safe location' (not a mine)
-
-	if(clickedY >= board.size() || clickedX >= board[0].size())
-	{
-		return;
-	}
-
-	int up;
-	bool keepGoingUp;
-	int down;
-	bool keepGoingDown;
-
-	//right (includes 'middle'
-	int right = 0;
-	while(clickedX + right < board[0].size())
-	{
-		up = 0;
-		down = 0;
-		keepGoingUp = true;
-		keepGoingDown = true;
-
-		while(keepGoingUp || keepGoingDown)
-		{
-			if(clickedY + up < board.size())
-			{
-				if(board[clickedY + up][clickedX + right].actualChar != boardCharSet.mineChar)
-				{
-					board[clickedY + up][clickedX + right].displayChar = board[clickedY + up][clickedX + right].actualChar;
-					up++;
-				} else
-				{
-					keepGoingUp = false;
-				}
-			} else
-			{
-				keepGoingUp = false;
-			}
-			if(clickedY - down >= 0)
-			{
-				if(board[clickedY - down][clickedX + right].actualChar != boardCharSet.mineChar)
-				{
-					board[clickedY - down][clickedX + right].displayChar = board[clickedY - down][clickedX + right].actualChar;
-					down++;
-				} else
-				{
-					keepGoingDown = false;
-				}
-			} else
-			{
-				keepGoingDown = false;
-			}
-		}
-		right++;
-
-		if(clickedX + right < board[0].size())
-		{
-			if(board[clickedY][clickedX + right].actualChar == boardCharSet.mineChar)
-			{
-				break;
-			}
-		}
-	}
-
-	//left
-	int left = 0;
-	while(clickedX - left > 0)
-	{
-		up = 0;
-		down = 0;
-		keepGoingUp = true;
-		keepGoingDown = true;
-
-		while(keepGoingUp || keepGoingDown)
-		{
-			if(clickedY + up < board.size())
-			{
-				if(board[clickedY + up][clickedX - left].actualChar != boardCharSet.mineChar)
-				{
-					board[clickedY + up][clickedX - left].displayChar = board[clickedY + up][clickedX - left].actualChar;
-					up++;
-				} else
-				{
-					keepGoingUp = false;
-				}
-			} else
-			{
-				keepGoingUp = false;
-			}
-
-			if(clickedY - down >= 0)
-			{
-				if(board[clickedY - down][clickedX - left].actualChar != boardCharSet.mineChar)
-				{
-					board[clickedY - down][clickedX - left].displayChar = board[clickedY - down][clickedX - left].actualChar;
-					down++;
-				} else
-				{
-					keepGoingDown = false;
-				}
-			} else
-			{
-				keepGoingDown = false;
-			}
-
-		}
-		left++;
-
-		if(clickedX - left > 0)
-		{
-			if(board[clickedY][clickedX - left].actualChar == boardCharSet.mineChar)
-			{
-				break;
-			}
-		}
-	}
-}
+//do RGB256/256, and get first 3 nums after decimal
+*/
 
 int main()
 {
@@ -305,10 +35,12 @@ int main()
 
 	mousemask(BUTTON1_CLICKED, NULL);
 	MEVENT mouseEvent;
+	int clickedX = 0;
+	int clickedY = 0;
 
 	int input;
 
-	if(!has_colors())
+	if(!has_colors() || !can_change_color())
 	{
 		endwin();
 		std::cerr << "Your terminal doesn't have colors!" << std::endl;
@@ -316,31 +48,51 @@ int main()
 	}
 	start_color();
 	use_default_colors(); //allows for -1 for transparent background
-	init_pair(1, COLOR_CYAN, 0);
-	init_pair(2, COLOR_GREEN, 0);
-	init_pair(3, COLOR_RED, 0);
-	init_pair(9, COLOR_BLACK, -1);
 
-	const int easyBoardWidth = 9;
+	init_color(CUSTOM_COLOR_ONE, 0, 0, 996);
+	init_color(CUSTOM_COLOR_TWO, 0, 507, 0);
+	init_color(CUSTOM_COLOR_THREE, 992, 0, 0);
+	init_color(CUSTOM_COLOR_FOUR, 0, 0, 515);
+	init_color(CUSTOM_COLOR_FIVE, 515, 0, 0);
+	init_color(CUSTOM_COLOR_SIX, 0, 507, 515);
+	init_color(CUSTOM_COLOR_SEVEN, 515, 0, 515);
+	init_color(CUSTOM_COLOR_EIGHT, 457, 457, 457);
+	init_color(CUSTOM_COLOR_NINE, 738, 738, 738);
+
+	init_pair(1, CUSTOM_COLOR_ONE, -1);
+	init_pair(2, CUSTOM_COLOR_TWO, -1);
+	init_pair(3, CUSTOM_COLOR_THREE, -1);
+	init_pair(4, CUSTOM_COLOR_FOUR, -1);
+	init_pair(5, CUSTOM_COLOR_FIVE, -1);
+	init_pair(6, CUSTOM_COLOR_SIX, -1);
+	init_pair(7, CUSTOM_COLOR_SEVEN, -1);
+	init_pair(8, CUSTOM_COLOR_EIGHT, -1);
+	init_pair(9, CUSTOM_COLOR_NINE, -1);
+
 	const int easyBoardHeight = 9;
+	const int easyBoardWidth = 9;
 	const int easyBoardMines = 10;
-	const int mediumBoardWidth = 16;
 	const int mediumBoardHeight = 16;
+	const int mediumBoardWidth = 16;
 	const int mediumBoardMines = 40;
-	const int hardBoardWidth = 30;
 	const int hardBoardHeight = 16;
+	const int hardBoardWidth = 30;
 	const int hardBoardMines = 99;
-	const int extremeBoardWidth = 30;
 	const int extremeBoardHeight = 24;
+	const int extremeBoardWidth = 30;
 	const int extremeBoardMines = 160;
 
-	int boardLeftPadding = 10;
-	int boardTopPadding = 20;
+	int chosenDifficultyBoardWidth = mediumBoardWidth;
+	int chosenDifficultyBoardHeight = mediumBoardHeight;
+	int chosenDifficultyBoardMines = mediumBoardMines;
 
-	BoardCharSet boardCharSet;
-	std::vector<std::vector<BoardCell>> board;
-	initializeBoard(board, mediumBoardHeight, mediumBoardWidth, mediumBoardMines, boardCharSet);
-	initializeNumbers(board, boardCharSet);
+	int boardLeftPadding = 0;
+	int boardTopPadding = 0;
+
+	Mines::BoardCharSet boardCharSet;
+	std::vector<std::vector<Mines::BoardCell>> board;
+	Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+	bool haveNotInitializedMinesYet = true;
 
 	while(true)
 	{
@@ -348,7 +100,20 @@ int main()
 		{
 			for(int x = 0; x < board[y].size(); x++)
 			{
-				mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+				if(board[y][x].displayChar >= '0' && board[y][x].displayChar <= '9')
+				{
+					attron(COLOR_PAIR(board[y][x].displayChar - '0'));
+					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+					attroff(COLOR_PAIR(board[y][x].displayChar - '0'));
+				} else if(board[y][x].displayChar !=  boardCharSet.blankChar)
+				{
+					attron(COLOR_PAIR(9));
+					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+					attroff(COLOR_PAIR(9));
+				} else
+				{
+					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+				}
 			}
 		}
 
@@ -357,26 +122,20 @@ int main()
 		{
 			if(mouseEvent.bstate &BUTTON1_CLICKED)
 			{
-				mvprintw(0, 0, "x: %d", mouseEvent.x);
-				mvprintw(1, 0, "y: %d", mouseEvent.y);
+				clickedX = mouseEvent.x;
+				clickedY = mouseEvent.y;
 
-				/*
-				for(int y = 0; y < board.size(); y++)
+				//mvprintw(0, 0, "x: %d", clickedX);
+				//mvprintw(1, 0, "y: %d", clickedY);
+
+				if(haveNotInitializedMinesYet)
 				{
-					for(int x = 0; x < board[y].size(); x++)
-					{
-						mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].actualChar);
-					}
+					Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
+					Mines::initializeNumbers(board, boardCharSet);
+					haveNotInitializedMinesYet = false;
 				}
-				*/
-				clearBoardWhereClicked(board, mouseEvent.y - boardTopPadding, mouseEvent.x - boardLeftPadding, boardCharSet);
-				for(int y = 0; y < board.size(); y++)
-				{
-					for(int x = 0; x < board[y].size(); x++)
-					{
-						mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
-					}
-				}
+
+				Mines::clearBoardWhereClicked(board, clickedY - boardTopPadding, clickedX - boardLeftPadding, boardCharSet);
 			}
 		}
 
