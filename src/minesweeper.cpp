@@ -363,116 +363,22 @@ namespace Mines
 
 		bool hitMine = false;
 
-		//!##
-		//#@#
-		//###
-		if(clickedY - 1 >= 0 && clickedX - 1 >= 0)
+		for(int y = -1; y <= 1; y++)
 		{
-			if(board[clickedY - 1][clickedX - 1].displayChar != boardCharSet.flagChar)
+			for(int x = -1; x <= 1; x++)
 			{
-				if(board[clickedY - 1][clickedX - 1].actualChar == boardCharSet.mineChar)
+				if(clickedY + y < board.size() && clickedY + y >= 0
+				&& clickedX + x < board[0].size() && clickedX + x >= 0)
 				{
-					hitMine = true;
+					if(board[clickedY + y][clickedX + x].displayChar != boardCharSet.flagChar)
+					{
+						if(board[clickedY + y][clickedX + x].actualChar == boardCharSet.mineChar)
+						{
+							hitMine = true;
+						}
+						board[clickedY + y][clickedX + x].displayChar = board[clickedY + y][clickedX + x].actualChar;
+					}
 				}
-				board[clickedY - 1][clickedX - 1].displayChar = board[clickedY - 1][clickedX - 1].actualChar;
-			}
-		}
-		//#!#
-		//#@#
-		//###
-		if(clickedY - 1 >= 0)
-		{
-			if(board[clickedY - 1][clickedX].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY - 1][clickedX].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY - 1][clickedX].displayChar = board[clickedY - 1][clickedX].actualChar;
-			}
-		}
-		//##!
-		//#@#
-		//###
-		if(clickedY - 1 >= 0 && clickedX + 1 < board[0].size())
-		{
-			if(board[clickedY - 1][clickedX + 1].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY - 1][clickedX + 1].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY - 1][clickedX + 1].displayChar = board[clickedY - 1][clickedX + 1].actualChar;
-			}
-		}
-		//###
-		//!@#
-		//###
-		if(clickedX - 1 >= 0) 
-		{
-			if(board[clickedY][clickedX - 1].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY][clickedX - 1].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY][clickedX - 1].displayChar = board[clickedY][clickedX - 1].actualChar;
-			}
-		}
-		//###
-		//#@!
-		//###
-		if(clickedX + 1 < board[0].size()) 
-		{
-			if(board[clickedY][clickedX + 1].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY][clickedX + 1].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY][clickedX + 1].displayChar = board[clickedY][clickedX + 1].actualChar;
-			}
-		}
-		//###
-		//#@#
-		//!##
-		if(clickedY + 1 < board.size() && clickedX - 1 >= 0)
-		{
-			if(board[clickedY + 1][clickedX - 1].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY + 1][clickedX - 1].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY + 1][clickedX - 1].displayChar = board[clickedY + 1][clickedX - 1].actualChar;
-			}
-		}
-		//###
-		//#@#
-		//#!#
-		if(clickedY + 1 < board.size())
-		{
-			if(board[clickedY + 1][clickedX].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY + 1][clickedX].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY + 1][clickedX].displayChar = board[clickedY + 1][clickedX].actualChar;
-			}
-		}
-		//###
-		//#@#
-		//##!
-		if(clickedY + 1 < board.size() && clickedX + 1 < board[0].size())
-		{
-			if(board[clickedY + 1][clickedX + 1].displayChar != boardCharSet.flagChar)
-			{
-				if(board[clickedY + 1][clickedX + 1].actualChar == boardCharSet.mineChar)
-				{
-					hitMine = true;
-				}
-				board[clickedY + 1][clickedX + 1].displayChar = board[clickedY + 1][clickedX + 1].actualChar;
 			}
 		}
 
