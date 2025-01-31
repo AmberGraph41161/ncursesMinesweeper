@@ -376,7 +376,14 @@ namespace Mines
 						{
 							hitMine = true;
 						}
-						board[clickedY + y][clickedX + x].displayChar = board[clickedY + y][clickedX + x].actualChar;
+
+						if(board[clickedY + y][clickedX + x].actualChar == boardCharSet.blankChar)
+						{
+							clearBoardWhereClicked(board, clickedY + y, clickedX + x, boardCharSet);
+						} else
+						{
+							board[clickedY + y][clickedX + x].displayChar = board[clickedY + y][clickedX + x].actualChar;
+						}
 					}
 				}
 			}
