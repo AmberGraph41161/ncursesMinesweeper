@@ -144,7 +144,7 @@ namespace Mines
 		}
 	}
 
-	void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet, bool revealWholeBoard)
+	void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
 	{
 		//https://en.wikipedia.org/wiki/Flood_fill
 		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
@@ -165,7 +165,7 @@ namespace Mines
 			return;
 		}
 
-		if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9') || revealWholeBoard)
+		if(board[clickedY][clickedX].actualChar < '0' || board[clickedY][clickedX].actualChar > '9')
 		{
 			clearBoardWhereClicked(board, clickedY + 1, clickedX, boardCharSet); //up
 			clearBoardWhereClicked(board, clickedY - 1, clickedX, boardCharSet); //down
@@ -392,4 +392,24 @@ namespace Mines
 		return !hitMine;
 	}
 
+	void revealWholeBoard(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet, bool revealMines)
+	{
+		for(int y = 0; y < board.size(); y++)
+		{
+			for(int x = 0; x < board[y].size(); x++)
+			{
+				if(board[y][x].displayChar == boardCharSet.flagChar && board[y][x].actualChar != boardCharSet.mineChar)
+				{
+					board[y][x].displayChar = boardCharSet.badFlagChar;
+				}
+
+				if(board[y][x].actualChar == boardCharSet.mineChar && !revealMines)
+				{
+					continue;
+				}
+
+				board[y][x].displayChar = board[y][x].actualChar;
+			}
+		}
+	}
 }

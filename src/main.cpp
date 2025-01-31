@@ -39,11 +39,6 @@ int main()
 	int clickedY = 0;
 	int clickedX = 0;
 
-	bool allowLeftButtonDownToFlag = true;
-	int mouseLeftButtonDownToFlagClickedY = 0;
-	int mouseLeftButtonDownToFlagClickedX = 0;
-	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
-
 	int input;
 
 	if(!has_colors() || !can_change_color())
@@ -75,6 +70,9 @@ int main()
 	init_pair(8, CUSTOM_COLOR_EIGHT, -1);
 	init_pair(9, CUSTOM_COLOR_NINE, -1);
 
+	bool allowLeftButtonDownToFlag = true;
+	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
+
 	const int easyBoardHeight = 9;
 	const int easyBoardWidth = 9;
 	const int easyBoardMines = 10;
@@ -99,6 +97,8 @@ int main()
 	std::vector<std::vector<Mines::BoardCell>> board;
 	Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 	bool haveNotInitializedMinesYet = true;
+	int revealWholeBoardOriginY;
+	int revealWholeBoardOriginX;
 
 	while(true)
 	{
@@ -159,6 +159,9 @@ int main()
 						Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
 						Mines::initializeNumbers(board, boardCharSet);
 						haveNotInitializedMinesYet = false;
+
+						revealWholeBoardOriginX = clickedY;
+						revealWholeBoardOriginY = clickedX;
 					}
 
 					if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
@@ -189,6 +192,15 @@ int main()
 		if(input == '`' || input == 'q')
 		{
 			break;
+		}
+
+		//temp debug controls as of Friday, January 31, 2025, 10:55:51
+		if(input == 'r')
+		{
+			Mines::revealWholeBoard(board, boardCharSet);
+		} else if (input == 'R')
+		{
+			Mines::revealWholeBoard(board, boardCharSet, false);
 		}
 	}
 	getch();
