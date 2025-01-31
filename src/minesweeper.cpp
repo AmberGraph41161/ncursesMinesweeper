@@ -401,6 +401,7 @@ namespace Mines
 				if(board[y][x].displayChar == boardCharSet.flagChar && board[y][x].actualChar != boardCharSet.mineChar)
 				{
 					board[y][x].displayChar = boardCharSet.badFlagChar;
+					continue;
 				}
 
 				if(board[y][x].actualChar == boardCharSet.mineChar && !revealMines)
