@@ -331,84 +331,18 @@ namespace Mines
 
 		int numberOfFlagsAroundCell = 0;
 
-		//!##
-		//#@#
-		//###
-		if(clickedY - 1 >= 0 && clickedX - 1 >= 0)
+		for(int y = -1; y <= 1; y++)
 		{
-			if(board[clickedY - 1][clickedX - 1].displayChar == boardCharSet.flagChar)
+			for(int x = -1; x <= 1; x++)
 			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//#!#
-		//#@#
-		//###
-		if(clickedY - 1 >= 0)
-		{
-			if(board[clickedY - 1][clickedX].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//##!
-		//#@#
-		//###
-		if(clickedY - 1 >= 0 && clickedX + 1 < board[0].size())
-		{
-			if(board[clickedY - 1][clickedX + 1].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//###
-		//!@#
-		//###
-		if(clickedX - 1 >= 0) 
-		{
-			if(board[clickedY][clickedX - 1].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//###
-		//#@!
-		//###
-		if(clickedX + 1 < board[0].size()) 
-		{
-			if(board[clickedY][clickedX + 1].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//###
-		//#@#
-		//!##
-		if(clickedY + 1 < board.size() && clickedX - 1 >= 0)
-		{
-			if(board[clickedY + 1][clickedX - 1].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//###
-		//#@#
-		//#!#
-		if(clickedY + 1 < board.size())
-		{
-			if(board[clickedY + 1][clickedX].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
-			}
-		}
-		//###
-		//#@#
-		//##!
-		if(clickedY + 1 < board.size() && clickedX + 1 < board[0].size())
-		{
-			if(board[clickedY + 1][clickedX + 1].displayChar == boardCharSet.flagChar)
-			{
-				numberOfFlagsAroundCell++;
+				if(clickedY + y < board.size() && clickedY + y >= 0
+				&& clickedX + x < board[0].size() && clickedX + x >= 0)
+				{
+					if(board[clickedY + y][clickedX + x].displayChar == boardCharSet.flagChar)
+					{
+						numberOfFlagsAroundCell++;
+					}
+				}
 			}
 		}
 
