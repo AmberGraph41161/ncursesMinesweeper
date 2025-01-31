@@ -33,10 +33,16 @@ int main()
 	keypad(stdscr, true); //allows arrow keys and function keys and mouse events
 	noecho();
 
-	mousemask(BUTTON1_CLICKED | BUTTON3_CLICKED, NULL);
+	mousemask(BUTTON1_PRESSED | BUTTON1_RELEASED | BUTTON3_PRESSED | BUTTON3_RELEASED, NULL);
+	mouseinterval(0);
 	MEVENT mouseEvent;
-	int clickedX = 0;
 	int clickedY = 0;
+	int clickedX = 0;
+
+	bool allowLeftButtonDownToFlag = true;
+	int mouseLeftButtonDownToFlagClickedY = 0;
+	int mouseLeftButtonDownToFlagClickedX = 0;
+	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
 
 	int input;
 
@@ -123,34 +129,58 @@ int main()
 			clickedY = mouseEvent.y - boardTopPadding;
 			clickedX = mouseEvent.x - boardLeftPadding;
 
-			if(mouseEvent.bstate &BUTTON1_CLICKED)
+			if(clickedY < 0 || clickedY >= board.size() || clickedX < 0 || clickedX >= board[0].size())
 			{
+				continue;
+			}
 
-				//mvprintw(0, 0, "x: %d", clickedX);
-				//mvprintw(1, 0, "y: %d", clickedY);
+			if(mouseEvent.bstate &BUTTON1_PRESSED)
+			{
+				bool mouseLeftButtonDownToFlagFailed = true;
 
-				if(haveNotInitializedMinesYet)
+				if(allowLeftButtonDownToFlag)
 				{
-					Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
-					Mines::initializeNumbers(board, boardCharSet);
-					haveNotInitializedMinesYet = false;
-				}
+					halfdelay(mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds);
 
-				if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
-				&& board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9')
-				{
-					if(Mines::numberOfFlagsAroundNumberCellMatch(board, clickedY, clickedX, boardCharSet))
+					input = getch();
+					if(input == ERR)
 					{
-						if(!Mines::numberOfFlagsClearBoardWhereClicked(board, clickedY, clickedX, boardCharSet))
-						{
-							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-						}
+						Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+						mouseLeftButtonDownToFlagFailed = false;
 					}
-				} else
-				{
-					Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+
+					raw(); //turn halfdelay off
 				}
-			} else if(mouseEvent.bstate &BUTTON3_CLICKED)
+
+				if(mouseLeftButtonDownToFlagFailed)
+				{
+					if(haveNotInitializedMinesYet)
+					{
+						Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
+						Mines::initializeNumbers(board, boardCharSet);
+						haveNotInitializedMinesYet = false;
+					}
+
+					if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
+					&& board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9')
+					{
+						if(Mines::numberOfFlagsAroundNumberCellMatch(board, clickedY, clickedX, boardCharSet))
+						{
+							if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
+							{
+								//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+							}
+						}
+					} else
+					{
+						Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+					}
+				}
+
+			}
+
+			if(mouseEvent.bstate &BUTTON3_PRESSED)
+			//if(mouseEvent.bstate &BUTTON3_RELEASED)
 			{
 				Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 			}

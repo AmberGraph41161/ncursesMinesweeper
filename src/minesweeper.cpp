@@ -415,7 +415,7 @@ namespace Mines
 		return (board[clickedY][clickedX].actualChar - '0' == numberOfFlagsAroundCell);
 	}
 
-	bool numberOfFlagsClearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
+	bool clearBoardWhereClickedAroundNumberCell(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
 	{
 		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
 		{
