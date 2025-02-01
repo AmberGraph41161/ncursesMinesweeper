@@ -134,6 +134,9 @@ int main()
 	int chosenDifficultyInformationTopPadding = 1;
 	int chosenDifficultyInformationLeftPadding = 1;
 	int gameOverInformationTopPadding = 2;
+	int gameOverInformationLeftPadding = 1;
+	int gameWonInformationTopPadding = 2;
+	int gameWonInformationLeftPadding = 1;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
@@ -147,7 +150,7 @@ int main()
 	{
 		if(startMenu)
 		{
-			clear();
+			//clear();
 			mvprintw(0, 0, "Choose Difficulty (press number keys on keyboard)");
 			attron(COLOR_PAIR(2));
 			mvprintw(1, 0, "1. Easy");
@@ -163,7 +166,7 @@ int main()
 			attroff(COLOR_PAIR(6));
 
 			input = getch();
-			clear();
+			//clear();
 
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK && (mouseEvent.bstate &BUTTON1_PRESSED))
 			{
@@ -325,9 +328,9 @@ int main()
 							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 							mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth, "+----------+");
-							mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth, "|game over!|");
-							mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "|game over!|");
+							mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "+----------+");
 							getch();
 							break;
 						}
@@ -363,6 +366,17 @@ int main()
 			} else if (input == 'R')
 			{
 				Mines::revealWholeBoard(board, boardCharSet, false);
+			}
+
+			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
+			{
+				mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+				mvprintw(gameWonInformationTopPadding + 0, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "+--------+");
+				mvprintw(gameWonInformationTopPadding + 1, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "|you won!|");
+				mvprintw(gameWonInformationTopPadding + 2, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "+--------+");
+				getch();
+				break;
 			}
 		}
 	}

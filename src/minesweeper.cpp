@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include <ncurses.h> //DELETE DEBUG
+
 namespace Mines
 {
 	int RANDOM(int minimum, int maximum)
@@ -27,20 +29,27 @@ namespace Mines
 	
 	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet)
 	{
+		//mvprintw(9, 50, "initializedMines: "); //DELETE DEBUG
+		int placedMines = 0; //DELETE DEBUG
+		mvprintw(9, 50, "placesMines: "); //DELETE DEBUG
 		for(int x = 0; x < boardMines; x++)
 		{
+			//printw("%d, ", x); //DELETE DEBUG
 			int randomSpotY = RANDOM(0, board.size() - 1);
-			int randomSpotX = RANDOM(0, board[0].size() - 1); 
+			int randomSpotX = RANDOM(0, board[0].size() - 1);
 
 			if(randomSpotY <= clickedY + 1 && randomSpotY >= clickedY - 1
 			&& randomSpotX <= clickedX + 1 && randomSpotX >= clickedX - 1
 			)
 			{
+
 				x--;
 			} else
 			{
+				placedMines++; //DELETE DEBUG
 				board[randomSpotY][randomSpotX].actualChar = boardCharSet.mineChar;
 			}
+			printw("%d, ", placedMines); //DELETE DEBUG
 		}
 	}
 
@@ -54,91 +63,25 @@ namespace Mines
 
 				if(board[y][x].actualChar != boardCharSet.mineChar)
 				{
-					//!##
-					//#@#
-					//###
-					if(y - 1 >= 0 && x - 1 >= 0)
+					for(int aroundY = -1; aroundY <= 1; aroundY++)
 					{
-						if(board[y - 1][x - 1].actualChar == boardCharSet.mineChar)
+						for(int aroundX = -1; aroundX <= 1; aroundX++)
 						{
-							tempMineCount++;
+							if(y + aroundY >= 0 && y + aroundY < board.size()
+							&& x + aroundX >= 0 && x + aroundX < board[0].size())
+							{
+								if(board[y + aroundY][x + aroundX].actualChar == boardCharSet.mineChar)
+								{
+									tempMineCount++;
+								}
+							}
 						}
 					}
-					//#!#
-					//#@#
-					//###
-					if(y - 1 >= 0)
-					{
-						if(board[y - 1][x].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//##!
-					//#@#
-					//###
-					if(y - 1 >= 0 && x + 1 < board[0].size())
-					{
-						if(board[y - 1][x + 1].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//###
-					//!@#
-					//###
-					if(x - 1 >= 0)
-					{
-						if(board[y][x - 1].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//###
-					//#@!
-					//###
-					if(x + 1 < board[0].size())
-					{
-						if(board[y][x + 1].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//###
-					//#@#
-					//!##
-					if(y + 1 < board.size() && x - 1 >= 0)
-					{
-						if(board[y + 1][x - 1].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//###
-					//#@#
-					//#!#
-					if(y + 1 < board.size())
-					{
-						if(board[y + 1][x].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-					//###
-					//#@#
-					//##!
-					if(y + 1 < board.size() && x + 1 < board[0].size())
-					{
-						if(board[y + 1][x + 1].actualChar == boardCharSet.mineChar)
-						{
-							tempMineCount++;
-						}
-					}
-				}
 
-				if(tempMineCount > 0)
-				{
-					board[y][x].actualChar = tempMineCount + '0';
+					if(tempMineCount > 0)
+					{
+						board[y][x].actualChar = tempMineCount + '0';
+					}
 				}
 			}
 		}
@@ -425,5 +368,54 @@ namespace Mines
 				board[y][x].displayChar = board[y][x].actualChar;
 			}
 		}
+	}
+
+	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
+	{
+		int realFlagCount = 0;
+		int fakeFlagCount = 0;
+		int realFilledCharCount = 0;
+		int fakeFilledCharCount = 0;
+
+		for(int y = 0; y < board.size(); y++)
+		{
+			for(int x = 0; x < board[y].size(); x++)
+			{
+				if(board[y][x].displayChar == boardCharSet.flagChar)
+				{
+					if(board[y][x].actualChar == boardCharSet.mineChar)
+					{
+						realFlagCount++;
+					} else
+					{
+						fakeFlagCount++;
+					}
+				} else if(board[y][x].displayChar == boardCharSet.filledChar)
+				{
+					if(board[y][x].actualChar == boardCharSet.mineChar)
+					{
+						realFilledCharCount++;
+					} else
+					{
+						fakeFilledCharCount++;
+					}
+				}
+			}
+		}
+
+		if(realFlagCount == chosenDifficultyBoardMines || realFilledCharCount == chosenDifficultyBoardMines)
+		{
+			if(fakeFlagCount == 0 && fakeFilledCharCount == 0)
+			{
+				return true;
+			}
+		}
+
+		mvprintw(10, 50, "realFlagCount: %d", realFlagCount); //DELETE DEBUG
+		mvprintw(11, 50, "fakeFlagCount: %d", fakeFlagCount); //DELETE DEBUG
+		mvprintw(12, 50, "realFilledCharCount: %d", realFilledCharCount); //DELETE DEBUG
+		mvprintw(13, 50, "fakeFilledCharCount: %d", fakeFilledCharCount); //DELETE DEBUG
+
+		return false;
 	}
 }
