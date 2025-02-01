@@ -24,6 +24,31 @@ init_color(COLOR_RED, 700, 0, 0);
 //do RGB256/256, and get first 3 nums after decimal
 */
 
+void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int &boardTopPadding, int &boardLeftPadding, Mines::BoardCharSet boardCharSet)
+{
+	for(int y = 0; y < board.size(); y++)
+	{
+		for(int x = 0; x < board[y].size(); x++)
+		{
+			if(board[y][x].displayChar >= '0' && board[y][x].displayChar <= '9')
+			{
+				attron(COLOR_PAIR(board[y][x].displayChar - '0'));
+				mvwprintw(window, y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+				attroff(COLOR_PAIR(board[y][x].displayChar - '0'));
+			} else if(board[y][x].displayChar !=  boardCharSet.blankChar)
+			{
+				attron(COLOR_PAIR(9));
+				mvwprintw(window, y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+				attroff(COLOR_PAIR(9));
+			} else
+			{
+				mvwprintw(window, y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
+			}
+		}
+	}
+
+}
+
 int main()
 {
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
@@ -86,121 +111,166 @@ int main()
 	const int extremeBoardWidth = 30;
 	const int extremeBoardMines = 160;
 
-	int chosenDifficultyBoardWidth = mediumBoardWidth;
-	int chosenDifficultyBoardHeight = mediumBoardHeight;
-	int chosenDifficultyBoardMines = mediumBoardMines;
+	int chosenDifficultyBoardHeight = 1;
+	int chosenDifficultyBoardWidth = 1;
+	int chosenDifficultyBoardMines = 1;
 
 	int boardLeftPadding = 0;
 	int boardTopPadding = 0;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
-	Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 	bool haveNotInitializedMinesYet = true;
-	int revealWholeBoardOriginY;
-	int revealWholeBoardOriginX;
 
+	bool startMenu = true;
+	bool pauseMenu = false;
+	bool gameplayMenu = false;
 	while(true)
 	{
-		for(int y = 0; y < board.size(); y++)
+		if(startMenu)
 		{
-			for(int x = 0; x < board[y].size(); x++)
-			{
-				if(board[y][x].displayChar >= '0' && board[y][x].displayChar <= '9')
-				{
-					attron(COLOR_PAIR(board[y][x].displayChar - '0'));
-					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
-					attroff(COLOR_PAIR(board[y][x].displayChar - '0'));
-				} else if(board[y][x].displayChar !=  boardCharSet.blankChar)
-				{
-					attron(COLOR_PAIR(9));
-					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
-					attroff(COLOR_PAIR(9));
-				} else
-				{
-					mvprintw(y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
-				}
-			}
-		}
+			clear();
+			mvprintw(0, 0, "Choose Difficulty (press number keys on keyboard)");
+			attron(COLOR_PAIR(2));
+			mvprintw(1, 0, "1. Easy");
+			attroff(COLOR_PAIR(2));
+			attron(COLOR_PAIR(1));
+			mvprintw(2, 0, "2. Medium");
+			attroff(COLOR_PAIR(1));
+			attron(COLOR_PAIR(3));
+			mvprintw(3, 0, "3. Hard");
+			attroff(COLOR_PAIR(3));
+			attron(COLOR_PAIR(6));
+			mvprintw(4, 0, "4. Extreme");
+			attroff(COLOR_PAIR(6));
 
-		input = getch();
-		if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
+			input = getch();
+
+			switch(input)
+			{
+				case '1':
+					chosenDifficultyBoardHeight = easyBoardHeight;
+					chosenDifficultyBoardWidth = easyBoardWidth;
+					chosenDifficultyBoardMines = easyBoardMines;
+					break;
+
+				case '2':
+					chosenDifficultyBoardHeight = mediumBoardHeight;
+					chosenDifficultyBoardWidth = mediumBoardWidth;
+					chosenDifficultyBoardMines = mediumBoardMines;
+					break;
+				
+				case '3':
+					chosenDifficultyBoardHeight = hardBoardHeight;
+					chosenDifficultyBoardWidth = hardBoardWidth;
+					chosenDifficultyBoardMines = hardBoardMines;
+					break;
+
+				case '4':
+					chosenDifficultyBoardHeight = extremeBoardHeight;
+					chosenDifficultyBoardWidth = extremeBoardWidth;
+					chosenDifficultyBoardMines = extremeBoardMines;
+					break;
+
+				default:
+					chosenDifficultyBoardHeight = easyBoardHeight;
+					chosenDifficultyBoardWidth = easyBoardWidth;
+					chosenDifficultyBoardMines = easyBoardMines;
+					break;
+			}
+			
+			Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+			startMenu = false;
+			gameplayMenu = true;
+			clear();
+		} else if(pauseMenu)
 		{
-			clickedY = mouseEvent.y - boardTopPadding;
-			clickedX = mouseEvent.x - boardLeftPadding;
 
-			if(clickedY < 0 || clickedY >= board.size() || clickedX < 0 || clickedX >= board[0].size())
+		} else if(gameplayMenu)
+		{
+			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+
+			input = getch();
+			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
 			{
-				continue;
-			}
+				clickedY = mouseEvent.y - boardTopPadding;
+				clickedX = mouseEvent.x - boardLeftPadding;
 
-			if(mouseEvent.bstate &BUTTON1_PRESSED)
-			{
-				bool mouseLeftButtonDownToFlagFailed = true;
-
-				if(allowLeftButtonDownToFlag)
+				if(clickedY < 0 || clickedY >= board.size() || clickedX < 0 || clickedX >= board[0].size())
 				{
-					halfdelay(mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds);
-
-					input = getch();
-					if(input == ERR)
-					{
-						Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
-						mouseLeftButtonDownToFlagFailed = false;
-					}
-
-					raw(); //turn halfdelay off
+					continue;
 				}
 
-				if(mouseLeftButtonDownToFlagFailed)
+				if(mouseEvent.bstate &BUTTON1_PRESSED)
 				{
-					if(haveNotInitializedMinesYet)
-					{
-						Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
-						Mines::initializeNumbers(board, boardCharSet);
-						haveNotInitializedMinesYet = false;
+					bool mouseLeftButtonDownToFlagFailed = true;
 
-						revealWholeBoardOriginX = clickedY;
-						revealWholeBoardOriginY = clickedX;
-					}
-
-					if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
-					&& board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9')
+					if(allowLeftButtonDownToFlag)
 					{
-						if(Mines::numberOfFlagsAroundNumberCellMatch(board, clickedY, clickedX, boardCharSet))
+						halfdelay(mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds);
+
+						input = getch();
+						if(input == ERR)
 						{
-							if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
-							{
-								//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-							}
+							Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+							mouseLeftButtonDownToFlagFailed = false;
 						}
-					} else
-					{
-						Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+
+						raw(); //turn halfdelay off
 					}
+
+					if(mouseLeftButtonDownToFlagFailed)
+					{
+						if(haveNotInitializedMinesYet)
+						{
+							Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
+							Mines::initializeNumbers(board, boardCharSet);
+							haveNotInitializedMinesYet = false;
+						}
+
+						if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar
+						&& board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9')
+						{
+							if(Mines::numberOfFlagsAroundNumberCellMatch(board, clickedY, clickedX, boardCharSet))
+							{
+								if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
+								{
+									//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+									drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+									mvprintw(0, chosenDifficultyBoardWidth, "+----------+");
+									mvprintw(1, chosenDifficultyBoardWidth, "|game over!|");
+									mvprintw(2, chosenDifficultyBoardWidth, "+----------+");
+									getch();
+									break;
+								}
+							}
+						} else
+						{
+							Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+						}
+					}
+
 				}
 
+				if(mouseEvent.bstate &BUTTON3_PRESSED)
+				{
+					Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+				}
 			}
 
-			if(mouseEvent.bstate &BUTTON3_PRESSED)
-			//if(mouseEvent.bstate &BUTTON3_RELEASED)
+			if(input == '`' || input == 'q')
 			{
-				Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+				break;
 			}
-		}
 
-		if(input == '`' || input == 'q')
-		{
-			break;
-		}
-
-		//temp debug controls as of Friday, January 31, 2025, 10:55:51
-		if(input == 'r')
-		{
-			Mines::revealWholeBoard(board, boardCharSet);
-		} else if (input == 'R')
-		{
-			Mines::revealWholeBoard(board, boardCharSet, false);
+			//temp debug controls as of Friday, January 31, 2025, 10:55:51
+			if(input == 'r')
+			{
+				Mines::revealWholeBoard(board, boardCharSet);
+			} else if (input == 'R')
+			{
+				Mines::revealWholeBoard(board, boardCharSet, false);
+			}
 		}
 	}
 	getch();
