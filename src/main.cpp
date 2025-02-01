@@ -122,7 +122,7 @@ int main()
 		":D", //2 left released
 		";p", //3 right pressed to flag
 		":p", //4 right released after flag
-		":(", //5 hit a mine
+		"X[", //5 hit a mine
 		":?", //6 clicked keyboard not mouse
 		":)", //7 default (nothing clicked/pressed)
 	};
@@ -139,6 +139,7 @@ int main()
 	std::vector<std::vector<Mines::BoardCell>> board;
 	bool haveNotInitializedMinesYet = true;
 
+	bool gameOver = false;
 	bool startMenu = true;
 	bool pauseMenu = false;
 	bool gameplayMenu = false;
@@ -308,18 +309,27 @@ int main()
 							{
 								if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
 								{
-									//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-									drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-									mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth, "+----------+");
-									mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth, "|game over!|");
-									mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth, "+----------+");
-									getch();
-									break;
+									gameOver = true;
 								}
 							}
 						} else
 						{
-							Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
+							if(!Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet))
+							{
+								gameOver = true;
+							}
+						}
+
+						if(gameOver)
+						{
+							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+							mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+							mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth, "|game over!|");
+							mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth, "+----------+");
+							getch();
+							break;
 						}
 					}
 

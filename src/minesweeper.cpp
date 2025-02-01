@@ -144,25 +144,30 @@ namespace Mines
 		}
 	}
 
-	void clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
+	bool clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
 	{
 		//https://en.wikipedia.org/wiki/Flood_fill
 		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
 		{
-			return;
+			return true;
 		}
 		
 		if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar)
 		{
-			return;
+			return true;
 		}
 
-		if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar && board[clickedY][clickedX].displayChar != boardCharSet.flagChar)
+		if(board[clickedY][clickedX].displayChar != boardCharSet.flagChar)
 		{
-			board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
-		} else
-		{
-			return;
+			if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar)
+			{
+				board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
+			} else
+			{
+				board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
+				return false;
+			}
+
 		}
 
 		if(board[clickedY][clickedX].actualChar < '0' || board[clickedY][clickedX].actualChar > '9')
@@ -176,6 +181,8 @@ namespace Mines
 			clearBoardWhereClicked(board, clickedY - 1, clickedX - 1, boardCharSet); //down left
 			clearBoardWhereClicked(board, clickedY - 1, clickedX + 1, boardCharSet); //down right
 		}
+
+		return true;
 	}
 
 	void clearBoardWhereClickedDEPRECATED(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
@@ -353,12 +360,12 @@ namespace Mines
 	{
 		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
 		{
-			return false;
+			return true;
 		}
 
 		if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9'))
 		{
-			return false;
+			return true;
 		}
 
 		bool hitMine = false;
