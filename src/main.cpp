@@ -58,6 +58,7 @@ int main()
 	raw(); //pass in ctrl-c ctrl-z and stuff
 	keypad(stdscr, true); //allows arrow keys and function keys and mouse events
 	noecho();
+	curs_set(0); //0 invisible, 1 terminal-specific normal,2 terminal-specific very visible
 
 	mousemask(BUTTON1_PRESSED | BUTTON1_RELEASED | BUTTON3_PRESSED | BUTTON3_RELEASED, NULL);
 	mouseinterval(0);
