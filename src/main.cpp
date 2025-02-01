@@ -115,8 +115,25 @@ int main()
 	int chosenDifficultyBoardWidth = 1;
 	int chosenDifficultyBoardMines = 1;
 
+	std::vector<std::string> smileyFaces =
+	{
+		":o", //0 left pressed
+		":3", //1 left held to flag
+		":D", //2 left released
+		";p", //3 right pressed to flag
+		":p", //4 right released after flag
+		":(", //5 hit a mine
+		":?", //6 clicked keyboard not mouse
+		":)", //7 default (nothing clicked/pressed)
+	};
+
 	int boardLeftPadding = 0;
 	int boardTopPadding = 0;
+	int smileyFaceInformationTopPadding = 0;
+	int smileyFaceInformationLeftPadding = 1;
+	int chosenDifficultyInformationTopPadding = 1;
+	int chosenDifficultyInformationLeftPadding = 1;
+	int gameOverInformationTopPadding = 2;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
@@ -145,6 +162,36 @@ int main()
 			attroff(COLOR_PAIR(6));
 
 			input = getch();
+			clear();
+
+			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK && (mouseEvent.bstate &BUTTON1_PRESSED))
+			{
+				clickedY = mouseEvent.y;
+				clickedX = mouseEvent.x;
+
+				switch(clickedY)
+				{
+					case 1:
+						input = '1';
+						break;
+
+					case 2:
+						input = '2';
+						break;
+
+					case 3:
+						input = '3';
+						break;
+
+					case 4:
+						input = '4';
+						break;
+
+					default:
+						input = '1';
+						break;
+				}
+			}
 
 			switch(input)
 			{
@@ -152,37 +199,57 @@ int main()
 					chosenDifficultyBoardHeight = easyBoardHeight;
 					chosenDifficultyBoardWidth = easyBoardWidth;
 					chosenDifficultyBoardMines = easyBoardMines;
+					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+					attron(COLOR_PAIR(2));
+					printw("easy");
+					attroff(COLOR_PAIR(2));
 					break;
 
 				case '2':
 					chosenDifficultyBoardHeight = mediumBoardHeight;
 					chosenDifficultyBoardWidth = mediumBoardWidth;
 					chosenDifficultyBoardMines = mediumBoardMines;
+					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+					attron(COLOR_PAIR(1));
+					printw("medium");
+					attroff(COLOR_PAIR(1));
 					break;
 				
 				case '3':
 					chosenDifficultyBoardHeight = hardBoardHeight;
 					chosenDifficultyBoardWidth = hardBoardWidth;
 					chosenDifficultyBoardMines = hardBoardMines;
+					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+					attron(COLOR_PAIR(3));
+					printw("hard");
+					attroff(COLOR_PAIR(3));
 					break;
 
 				case '4':
 					chosenDifficultyBoardHeight = extremeBoardHeight;
 					chosenDifficultyBoardWidth = extremeBoardWidth;
 					chosenDifficultyBoardMines = extremeBoardMines;
+					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+					attron(COLOR_PAIR(6));
+					printw("extreme");
+					attroff(COLOR_PAIR(6));
 					break;
 
 				default:
 					chosenDifficultyBoardHeight = easyBoardHeight;
 					chosenDifficultyBoardWidth = easyBoardWidth;
 					chosenDifficultyBoardMines = easyBoardMines;
+					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+					attron(COLOR_PAIR(2));
+					printw("easy");
+					attroff(COLOR_PAIR(2));
 					break;
 			}
 			
+			mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[7].c_str());
 			Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 			startMenu = false;
 			gameplayMenu = true;
-			clear();
 		} else if(pauseMenu)
 		{
 
@@ -203,15 +270,19 @@ int main()
 
 				if(mouseEvent.bstate &BUTTON1_PRESSED)
 				{
+					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[0].c_str());
+
 					bool mouseLeftButtonDownToFlagFailed = true;
 
 					if(allowLeftButtonDownToFlag)
 					{
 						halfdelay(mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds);
 
-						input = getch();
-						if(input == ERR)
+						int tempInput = getch();
+						if(tempInput == ERR)
 						{
+							mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[1].c_str());
+
 							Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 							mouseLeftButtonDownToFlagFailed = false;
 						}
@@ -221,6 +292,8 @@ int main()
 
 					if(mouseLeftButtonDownToFlagFailed)
 					{
+						mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[2].c_str());
+
 						if(haveNotInitializedMinesYet)
 						{
 							Mines::initializeMines(board, clickedY, clickedX, chosenDifficultyBoardMines, boardCharSet);
@@ -237,9 +310,9 @@ int main()
 								{
 									//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 									drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-									mvprintw(0, chosenDifficultyBoardWidth, "+----------+");
-									mvprintw(1, chosenDifficultyBoardWidth, "|game over!|");
-									mvprintw(2, chosenDifficultyBoardWidth, "+----------+");
+									mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth, "+----------+");
+									mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth, "|game over!|");
+									mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth, "+----------+");
 									getch();
 									break;
 								}
@@ -252,10 +325,20 @@ int main()
 
 				}
 
+				if(mouseEvent.bstate &BUTTON3_RELEASED)
+				{
+					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[4].c_str());
+				}
+
 				if(mouseEvent.bstate &BUTTON3_PRESSED)
 				{
+					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[3].c_str());
+
 					Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 				}
+			} else
+			{
+				mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
 			}
 
 			if(input == '`' || input == 'q')

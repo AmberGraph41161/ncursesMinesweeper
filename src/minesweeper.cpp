@@ -384,6 +384,12 @@ namespace Mines
 						{
 							board[clickedY + y][clickedX + x].displayChar = board[clickedY + y][clickedX + x].actualChar;
 						}
+					} else
+					{
+						if(hitMine && board[clickedY + y][clickedX + x].actualChar != boardCharSet.mineChar)
+						{
+							board[clickedY + y][clickedX + x].displayChar = boardCharSet.badFlagChar;
+						}
 					}
 				}
 			}
