@@ -3,8 +3,6 @@
 #include <cstdlib>
 #include <vector>
 
-#include <ncurses.h> //DELETE DEBUG
-
 namespace Mines
 {
 	int RANDOM(int minimum, int maximum)
@@ -24,32 +22,27 @@ namespace Mines
 				tempRow.push_back(tempBoardCell);
 			}
 			board.push_back(tempRow);
+			tempRow.clear();
 		}
 	}
 	
 	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet)
 	{
-		//mvprintw(9, 50, "initializedMines: "); //DELETE DEBUG
-		int placedMines = 0; //DELETE DEBUG
-		mvprintw(9, 50, "placesMines: "); //DELETE DEBUG
 		for(int x = 0; x < boardMines; x++)
 		{
-			//printw("%d, ", x); //DELETE DEBUG
 			int randomSpotY = RANDOM(0, board.size() - 1);
 			int randomSpotX = RANDOM(0, board[0].size() - 1);
 
-			if(randomSpotY <= clickedY + 1 && randomSpotY >= clickedY - 1
-			&& randomSpotX <= clickedX + 1 && randomSpotX >= clickedX - 1
+			if((randomSpotY >= clickedY - 1 && randomSpotY <= clickedY + 1
+			&& randomSpotX >= clickedX - 1 && randomSpotX <= clickedX + 1)
+			|| (board[randomSpotY][randomSpotX].actualChar ==  boardCharSet.mineChar)
 			)
 			{
-
 				x--;
 			} else
 			{
-				placedMines++; //DELETE DEBUG
 				board[randomSpotY][randomSpotX].actualChar = boardCharSet.mineChar;
 			}
-			printw("%d, ", placedMines); //DELETE DEBUG
 		}
 	}
 
@@ -102,18 +95,16 @@ namespace Mines
 
 		if(board[clickedY][clickedX].displayChar != boardCharSet.flagChar)
 		{
-			if(board[clickedY][clickedX].actualChar != boardCharSet.mineChar)
+			board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
+
+			if(board[clickedY][clickedX].actualChar == boardCharSet.mineChar)
 			{
-				board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
-			} else
-			{
-				board[clickedY][clickedX].displayChar = board[clickedY][clickedX].actualChar;
 				return false;
 			}
-
 		}
 
-		if(board[clickedY][clickedX].actualChar < '0' || board[clickedY][clickedX].actualChar > '9')
+		if(board[clickedY][clickedX].displayChar != boardCharSet.flagChar
+		&& (board[clickedY][clickedX].actualChar < '0' || board[clickedY][clickedX].actualChar > '9'))
 		{
 			clearBoardWhereClicked(board, clickedY + 1, clickedX, boardCharSet); //up
 			clearBoardWhereClicked(board, clickedY - 1, clickedX, boardCharSet); //down
@@ -126,125 +117,6 @@ namespace Mines
 		}
 
 		return true;
-	}
-
-	void clearBoardWhereClickedDEPRECATED(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet boardCharSet)
-	{
-		//function assumes that where you clicked was a 'safe location' (not a mine)
-
-		if(clickedY >= board.size() || clickedX >= board[0].size())
-		{
-			return;
-		}
-
-		int up;
-		bool keepGoingUp;
-		int down;
-		bool keepGoingDown;
-
-		//right (includes 'middle'
-		int right = 0;
-		while(clickedX + right < board[0].size())
-		{
-			up = 0;
-			down = 0;
-			keepGoingUp = true;
-			keepGoingDown = true;
-
-			while(keepGoingUp || keepGoingDown)
-			{
-				if(clickedY + up < board.size())
-				{
-					if(board[clickedY + up][clickedX + right].actualChar != boardCharSet.mineChar)
-					{
-						board[clickedY + up][clickedX + right].displayChar = board[clickedY + up][clickedX + right].actualChar;
-						up++;
-					} else
-					{
-						keepGoingUp = false;
-					}
-				} else
-				{
-					keepGoingUp = false;
-				}
-				if(clickedY - down >= 0)
-				{
-					if(board[clickedY - down][clickedX + right].actualChar != boardCharSet.mineChar)
-					{
-						board[clickedY - down][clickedX + right].displayChar = board[clickedY - down][clickedX + right].actualChar;
-						down++;
-					} else
-					{
-						keepGoingDown = false;
-					}
-				} else
-				{
-					keepGoingDown = false;
-				}
-			}
-			right++;
-
-			if(clickedX + right < board[0].size())
-			{
-				if(board[clickedY][clickedX + right].actualChar == boardCharSet.mineChar)
-				{
-					break;
-				}
-			}
-		}
-
-		//left
-		int left = 0;
-		while(clickedX - left > 0)
-		{
-			up = 0;
-			down = 0;
-			keepGoingUp = true;
-			keepGoingDown = true;
-
-			while(keepGoingUp || keepGoingDown)
-			{
-				if(clickedY + up < board.size())
-				{
-					if(board[clickedY + up][clickedX - left].actualChar != boardCharSet.mineChar)
-					{
-						board[clickedY + up][clickedX - left].displayChar = board[clickedY + up][clickedX - left].actualChar;
-						up++;
-					} else
-					{
-						keepGoingUp = false;
-					}
-				} else
-				{
-					keepGoingUp = false;
-				}
-
-				if(clickedY - down >= 0)
-				{
-					if(board[clickedY - down][clickedX - left].actualChar != boardCharSet.mineChar)
-					{
-						board[clickedY - down][clickedX - left].displayChar = board[clickedY - down][clickedX - left].actualChar;
-						down++;
-					} else
-					{
-						keepGoingDown = false;
-					}
-				} else
-				{
-					keepGoingDown = false;
-				}
-
-			}
-			left++;
-
-			if(clickedX - left > 0)
-			{
-				if(board[clickedY][clickedX - left].actualChar == boardCharSet.mineChar)
-				{
-					break;
-				}
-			}
-		}
 	}
 
 	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
@@ -306,7 +178,7 @@ namespace Mines
 			return true;
 		}
 
-		if(!(board[clickedY][clickedX].actualChar >= '0' && board[clickedY][clickedX].actualChar <= '9'))
+		if(board[clickedY][clickedX].actualChar < '0' || board[clickedY][clickedX].actualChar > '9')
 		{
 			return true;
 		}
@@ -320,27 +192,21 @@ namespace Mines
 				if(clickedY + y < board.size() && clickedY + y >= 0
 				&& clickedX + x < board[0].size() && clickedX + x >= 0)
 				{
-					if(board[clickedY + y][clickedX + x].displayChar != boardCharSet.flagChar)
+					if(board[clickedY + y][clickedX + x].actualChar != boardCharSet.mineChar
+					&& board[clickedY + y][clickedX + x].displayChar == boardCharSet.flagChar)
+					{
+						board[clickedY + y][clickedX + x].displayChar = boardCharSet.badFlagChar;
+					}
+
+					if(board[clickedY + y][clickedX + x].displayChar == boardCharSet.filledChar)
 					{
 						if(board[clickedY + y][clickedX + x].actualChar == boardCharSet.mineChar)
 						{
 							hitMine = true;
 						}
-
-						if(board[clickedY + y][clickedX + x].actualChar == boardCharSet.blankChar)
-						{
-							clearBoardWhereClicked(board, clickedY + y, clickedX + x, boardCharSet);
-						} else
-						{
-							board[clickedY + y][clickedX + x].displayChar = board[clickedY + y][clickedX + x].actualChar;
-						}
-					} else
-					{
-						if(hitMine && board[clickedY + y][clickedX + x].actualChar != boardCharSet.mineChar)
-						{
-							board[clickedY + y][clickedX + x].displayChar = boardCharSet.badFlagChar;
-						}
+						clearBoardWhereClicked(board, clickedY + y, clickedX + x, boardCharSet);
 					}
+
 				}
 			}
 		}
@@ -410,11 +276,6 @@ namespace Mines
 				return true;
 			}
 		}
-
-		mvprintw(10, 50, "realFlagCount: %d", realFlagCount); //DELETE DEBUG
-		mvprintw(11, 50, "fakeFlagCount: %d", fakeFlagCount); //DELETE DEBUG
-		mvprintw(12, 50, "realFilledCharCount: %d", realFilledCharCount); //DELETE DEBUG
-		mvprintw(13, 50, "fakeFilledCharCount: %d", fakeFilledCharCount); //DELETE DEBUG
 
 		return false;
 	}

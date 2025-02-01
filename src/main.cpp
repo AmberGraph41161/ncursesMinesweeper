@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <ncurses.h>
+#include <vector>
 
 #include "minesweeper.hpp"
 
@@ -46,8 +47,8 @@ void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board
 			}
 		}
 	}
-
 }
+
 
 int main()
 {
@@ -150,7 +151,7 @@ int main()
 	{
 		if(startMenu)
 		{
-			//clear();
+			clear();
 			mvprintw(0, 0, "Choose Difficulty (press number keys on keyboard)");
 			attron(COLOR_PAIR(2));
 			mvprintw(1, 0, "1. Easy");
@@ -166,7 +167,7 @@ int main()
 			attroff(COLOR_PAIR(6));
 
 			input = getch();
-			//clear();
+			clear();
 
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK && (mouseEvent.bstate &BUTTON1_PRESSED))
 			{
