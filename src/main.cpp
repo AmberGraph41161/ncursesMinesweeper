@@ -108,19 +108,29 @@ int main()
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
 
+	const int easyBoardDifficulty = 1;
 	const int easyBoardHeight = 9;
 	const int easyBoardWidth = 9;
 	const int easyBoardMines = 10;
+	const int mediumBoardDifficulty = 2;
 	const int mediumBoardHeight = 16;
 	const int mediumBoardWidth = 16;
 	const int mediumBoardMines = 40;
+	const int hardBoardDifficulty = 3;
 	const int hardBoardHeight = 16;
 	const int hardBoardWidth = 30;
 	const int hardBoardMines = 99;
+	const int extremeBoardDifficulty = 4;
 	const int extremeBoardHeight = 24;
 	const int extremeBoardWidth = 30;
 	const int extremeBoardMines = 160;
 
+	int customBoardDifficulty = 0;
+	int customBoardHeight = 0;
+	int customBoardWidth = 0;
+	int custmBoardMines = 0;
+
+	int chosenDifficulty = 1;
 	int chosenDifficultyBoardHeight = 1;
 	int chosenDifficultyBoardWidth = 1;
 	int chosenDifficultyBoardMines = 1;
@@ -178,6 +188,9 @@ int main()
 			attron(COLOR_PAIR(6));
 			mvprintw(4, 0, "4. Extreme");
 			attroff(COLOR_PAIR(6));
+			attron(COLOR_PAIR(7));
+			mvprintw(5, 0, "5. Custom");
+			attroff(COLOR_PAIR(7));
 
 			input = getch();
 			clear();
@@ -187,28 +200,7 @@ int main()
 				clickedY = mouseEvent.y;
 				clickedX = mouseEvent.x;
 
-				switch(clickedY)
-				{
-					case 1:
-						input = '1';
-						break;
-
-					case 2:
-						input = '2';
-						break;
-
-					case 3:
-						input = '3';
-						break;
-
-					case 4:
-						input = '4';
-						break;
-
-					default:
-						input = '1';
-						break;
-				}
+				input = clickedY + '0';
 			}
 
 			switch(input)
@@ -217,50 +209,42 @@ int main()
 					chosenDifficultyBoardHeight = easyBoardHeight;
 					chosenDifficultyBoardWidth = easyBoardWidth;
 					chosenDifficultyBoardMines = easyBoardMines;
-					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
-					attron(COLOR_PAIR(2));
-					printw("easy");
-					attroff(COLOR_PAIR(2));
+					chosenDifficulty = easyBoardDifficulty;
 					break;
 
 				case '2':
 					chosenDifficultyBoardHeight = mediumBoardHeight;
 					chosenDifficultyBoardWidth = mediumBoardWidth;
 					chosenDifficultyBoardMines = mediumBoardMines;
-					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
-					attron(COLOR_PAIR(1));
-					printw("medium");
-					attroff(COLOR_PAIR(1));
+					chosenDifficulty = mediumBoardDifficulty;
 					break;
 				
 				case '3':
 					chosenDifficultyBoardHeight = hardBoardHeight;
 					chosenDifficultyBoardWidth = hardBoardWidth;
 					chosenDifficultyBoardMines = hardBoardMines;
-					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
-					attron(COLOR_PAIR(3));
-					printw("hard");
-					attroff(COLOR_PAIR(3));
+					chosenDifficulty = hardBoardDifficulty;
 					break;
 
 				case '4':
 					chosenDifficultyBoardHeight = extremeBoardHeight;
 					chosenDifficultyBoardWidth = extremeBoardWidth;
 					chosenDifficultyBoardMines = extremeBoardMines;
-					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
-					attron(COLOR_PAIR(6));
-					printw("extreme");
-					attroff(COLOR_PAIR(6));
+					chosenDifficulty = extremeBoardDifficulty;
 					break;
+
+				case '5':
+				{
+					chosenDifficulty = customBoardDifficulty;
+					//while(true)
+					break;
+				}
 
 				default:
 					chosenDifficultyBoardHeight = easyBoardHeight;
 					chosenDifficultyBoardWidth = easyBoardWidth;
 					chosenDifficultyBoardMines = easyBoardMines;
-					mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyBoardWidth + chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
-					attron(COLOR_PAIR(2));
-					printw("easy");
-					attroff(COLOR_PAIR(2));
+					chosenDifficulty = easyBoardDifficulty;
 					break;
 			}
 			
@@ -284,14 +268,45 @@ int main()
 
 			boardTopPadding = (screenHeight / 2) - (chosenDifficultyBoardHeight / 2);
 			boardLeftPadding = (screenWidth / 2) - (chosenDifficultyBoardWidth / 2);
-			smileyFaceInformationTopPadding = 0 + boardTopPadding;
-			smileyFaceInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
-			gameOverInformationTopPadding = 1 + boardTopPadding;
-			gameOverInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
-			gameWonInformationTopPadding = 2 + boardTopPadding;
-			gameWonInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
+			smileyFaceInformationTopPadding = boardTopPadding + 0;
+			smileyFaceInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
+			chosenDifficultyInformationTopPadding = boardTopPadding + 1;
+			chosenDifficultyInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
+			gameOverInformationTopPadding = boardTopPadding + 2;
+			gameOverInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
+			gameWonInformationTopPadding = boardTopPadding + 2;
+			gameWonInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+			mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
+			switch(chosenDifficulty)
+			{
+				case easyBoardDifficulty:
+					attron(COLOR_PAIR(2));
+					printw("easy");
+					attroff(COLOR_PAIR(2));
+					break;
+				case mediumBoardDifficulty:
+					attron(COLOR_PAIR(1));
+					printw("medium");
+					attroff(COLOR_PAIR(1));
+					break;
+				case hardBoardDifficulty:
+					attron(COLOR_PAIR(3));
+					printw("hard");
+					attroff(COLOR_PAIR(3));
+					break;
+				case extremeBoardDifficulty:
+					attron(COLOR_PAIR(6));
+					printw("hard");
+					attroff(COLOR_PAIR(6));
+					break;
+				default:
+					attron(COLOR_PAIR(7));
+					printw("custom");
+					attroff(COLOR_PAIR(7));
+					break;
+			}
 
 			input = getch();
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
