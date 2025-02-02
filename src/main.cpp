@@ -132,26 +132,30 @@ int main()
 		":D", //2 left released
 		";p", //3 right pressed to flag
 		":p", //4 right released after flag
-		"X[", //5 hit a mine
+		"X(", //5 hit a mine
 		":?", //6 clicked keyboard not mouse
 		":)", //7 default (nothing clicked/pressed)
 	};
 
 	int boardLeftPadding = 0;
 	int boardTopPadding = 0;
-	int smileyFaceInformationTopPadding;
-	int smileyFaceInformationLeftPadding;
-	int chosenDifficultyInformationTopPadding;
-	int chosenDifficultyInformationLeftPadding;
-	int gameOverInformationTopPadding;
-	int gameOverInformationLeftPadding;
-	int gameWonInformationTopPadding;
-	int gameWonInformationLeftPadding;
+	int smileyFaceInformationTopPadding = 0;
+	int smileyFaceInformationLeftPadding = 0;
+	int chosenDifficultyInformationTopPadding = 0;
+	int chosenDifficultyInformationLeftPadding = 0;
+	int gameOverInformationTopPadding = 0;
+	int gameOverInformationLeftPadding = 0;
+	int gameWonInformationTopPadding = 0;
+	int gameWonInformationLeftPadding = 0;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
 	bool haveNotInitializedMinesYet = true;
 
+	int screenHeight = 0;
+	int screenWidth = 0;
+	int previousScreenHeight = 0;
+	int previousScreenWidth = 0;
 	bool gameOver = false;
 	bool startMenu = true;
 	bool pauseMenu = false;
@@ -260,7 +264,7 @@ int main()
 					break;
 			}
 			
-			mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[7].c_str());
+			mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth, "%s", smileyFaces[7].c_str());
 			Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 			startMenu = false;
 			gameplayMenu = true;
@@ -270,10 +274,6 @@ int main()
 		} else if(gameplayMenu)
 		{
 			//center information padding
-			int screenHeight;
-			int screenWidth;
-			int previousScreenHeight;
-			int previousScreenWidth;
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			if(screenHeight != previousScreenHeight || screenWidth != previousScreenWidth)
 			{
@@ -290,7 +290,6 @@ int main()
 			gameOverInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
 			gameWonInformationTopPadding = 2 + boardTopPadding;
 			gameWonInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
-
 
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 
