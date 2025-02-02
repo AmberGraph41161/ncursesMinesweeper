@@ -16,6 +16,7 @@
 #define CUSTOM_COLOR_SEVEN 27
 #define CUSTOM_COLOR_EIGHT 28
 #define CUSTOM_COLOR_NINE 29
+#define CUSTOM_COLOR_TEN 30
 
 /*
 init_color(COLOR_RED, 700, 0, 0);
@@ -86,16 +87,23 @@ int main()
 	init_color(CUSTOM_COLOR_SEVEN, 515, 0, 515);
 	init_color(CUSTOM_COLOR_EIGHT, 457, 457, 457);
 	init_color(CUSTOM_COLOR_NINE, 738, 738, 738);
+	init_color(CUSTOM_COLOR_TEN, 300, 300, 300);
 
-	init_pair(1, CUSTOM_COLOR_ONE, -1);
-	init_pair(2, CUSTOM_COLOR_TWO, -1);
-	init_pair(3, CUSTOM_COLOR_THREE, -1);
-	init_pair(4, CUSTOM_COLOR_FOUR, -1);
-	init_pair(5, CUSTOM_COLOR_FIVE, -1);
-	init_pair(6, CUSTOM_COLOR_SIX, -1);
-	init_pair(7, CUSTOM_COLOR_SEVEN, -1);
-	init_pair(8, CUSTOM_COLOR_EIGHT, -1);
-	init_pair(9, CUSTOM_COLOR_NINE, -1);
+	const int backgroundColorWhite = COLOR_WHITE;
+	const int backgroundColorGray = CUSTOM_COLOR_TEN;
+	const int backgroundColorBlack = COLOR_BLACK;
+	const int backgroundColorTransparent = -1; 
+	int backgroundColor = backgroundColorGray;
+
+	init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+	init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+	init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+	init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+	init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+	init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+	init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+	init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+	init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
 
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
@@ -131,14 +139,14 @@ int main()
 
 	int boardLeftPadding = 0;
 	int boardTopPadding = 0;
-	int smileyFaceInformationTopPadding = 0;
-	int smileyFaceInformationLeftPadding = 1;
-	int chosenDifficultyInformationTopPadding = 1;
-	int chosenDifficultyInformationLeftPadding = 1;
-	int gameOverInformationTopPadding = 2;
-	int gameOverInformationLeftPadding = 1;
-	int gameWonInformationTopPadding = 2;
-	int gameWonInformationLeftPadding = 1;
+	int smileyFaceInformationTopPadding;
+	int smileyFaceInformationLeftPadding;
+	int chosenDifficultyInformationTopPadding;
+	int chosenDifficultyInformationLeftPadding;
+	int gameOverInformationTopPadding;
+	int gameOverInformationLeftPadding;
+	int gameWonInformationTopPadding;
+	int gameWonInformationLeftPadding;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
@@ -261,6 +269,29 @@ int main()
 
 		} else if(gameplayMenu)
 		{
+			//center information padding
+			int screenHeight;
+			int screenWidth;
+			int previousScreenHeight;
+			int previousScreenWidth;
+			getmaxyx(stdscr, screenHeight, screenWidth);
+			if(screenHeight != previousScreenHeight || screenWidth != previousScreenWidth)
+			{
+				clear();
+			}
+			previousScreenHeight = screenHeight;
+			previousScreenWidth = screenWidth;
+
+			boardTopPadding = (screenHeight / 2) - (chosenDifficultyBoardHeight / 2);
+			boardLeftPadding = (screenWidth / 2) - (chosenDifficultyBoardWidth / 2);
+			smileyFaceInformationTopPadding = 0 + boardTopPadding;
+			smileyFaceInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
+			gameOverInformationTopPadding = 1 + boardTopPadding;
+			gameOverInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
+			gameWonInformationTopPadding = 2 + boardTopPadding;
+			gameWonInformationLeftPadding = 1 + chosenDifficultyBoardWidth + boardLeftPadding;
+
+
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 
 			input = getch();
@@ -276,7 +307,7 @@ int main()
 
 				if(mouseEvent.bstate &BUTTON1_PRESSED)
 				{
-					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[0].c_str());
+					mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[0].c_str());
 
 					bool mouseLeftButtonDownToFlagFailed = true;
 
@@ -287,7 +318,7 @@ int main()
 						int tempInput = getch();
 						if(tempInput == ERR)
 						{
-							mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[1].c_str());
+							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[1].c_str());
 
 							Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 							mouseLeftButtonDownToFlagFailed = false;
@@ -298,7 +329,7 @@ int main()
 
 					if(mouseLeftButtonDownToFlagFailed)
 					{
-						mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[2].c_str());
+						mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[2].c_str());
 
 						if(haveNotInitializedMinesYet)
 						{
@@ -328,11 +359,11 @@ int main()
 						if(gameOver)
 						{
 							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-							mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "+----------+");
-							mvprintw(gameOverInformationTopPadding + 1, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "|game over!|");
-							mvprintw(gameOverInformationTopPadding + 2, chosenDifficultyBoardWidth + gameOverInformationLeftPadding, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|game over!|");
+							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "+----------+");
 							getch();
 							break;
 						}
@@ -342,18 +373,18 @@ int main()
 
 				if(mouseEvent.bstate &BUTTON3_RELEASED)
 				{
-					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[4].c_str());
+					mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[4].c_str());
 				}
 
 				if(mouseEvent.bstate &BUTTON3_PRESSED)
 				{
-					mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[3].c_str());
+					mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[3].c_str());
 
 					Mines::flagBoardWhereClicked(board, clickedY, clickedX, boardCharSet);
 				}
 			} else
 			{
-				mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
 			}
 
 			if(input == '`' || input == 'q')
@@ -372,11 +403,11 @@ int main()
 
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
-				mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth + smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-				mvprintw(gameWonInformationTopPadding + 0, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "+--------+");
-				mvprintw(gameWonInformationTopPadding + 1, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "|you won!|");
-				mvprintw(gameWonInformationTopPadding + 2, chosenDifficultyBoardWidth + gameWonInformationLeftPadding, "+--------+");
+				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+--------+");
+				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|you won!|");
+				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "+--------+");
 				getch();
 				break;
 			}
