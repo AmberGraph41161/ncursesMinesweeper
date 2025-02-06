@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <ncurses.h>
+#include <array>
 #include <vector>
 
 #include "minesweeper.hpp"
@@ -124,17 +125,17 @@ int main()
 	const int extremeBoardHeight = 24;
 	const int extremeBoardWidth = 30;
 	const int extremeBoardMines = 160;
+	const int customBoardDifficulty = 5;
 
-	int customBoardDifficulty = 0;
-	int customBoardHeight = 0;
-	int customBoardWidth = 0;
-	int custmBoardMines = 0;
+	int customBoardMenuCursor = 0;
+	int customBoardMenuInputBuffer = 0;
 
-	int chosenDifficulty = 1;
-	int chosenDifficultyBoardHeight = 1;
-	int chosenDifficultyBoardWidth = 1;
-	int chosenDifficultyBoardMines = 1;
+	int chosenDifficulty = easyBoardDifficulty;
+	int chosenDifficultyBoardHeight = 0;
+	int chosenDifficultyBoardWidth = 0;
+	int chosenDifficultyBoardMines = 0;
 
+	bool initialSmileyFacesHasBeenPrinted = false;
 	std::vector<std::string> smileyFaces =
 	{
 		":o", //0 left pressed
@@ -168,6 +169,7 @@ int main()
 	int previousScreenWidth = 0;
 	bool gameOver = false;
 	bool startMenu = true;
+	bool customBoardMenu = false;
 	bool pauseMenu = false;
 	bool gameplayMenu = false;
 	while(true)
@@ -193,6 +195,10 @@ int main()
 			attroff(COLOR_PAIR(7));
 
 			input = getch();
+			if(input == 'q' || input == '`')
+			{
+				break;
+			}
 			clear();
 
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK && (mouseEvent.bstate &BUTTON1_PRESSED))
@@ -234,11 +240,10 @@ int main()
 					break;
 
 				case '5':
-				{
 					chosenDifficulty = customBoardDifficulty;
-					//while(true)
-					break;
-				}
+					startMenu = false;
+					customBoardMenu = true;
+					continue;
 
 				default:
 					chosenDifficultyBoardHeight = easyBoardHeight;
@@ -247,11 +252,124 @@ int main()
 					chosenDifficulty = easyBoardDifficulty;
 					break;
 			}
-			
-			mvprintw(smileyFaceInformationTopPadding, chosenDifficultyBoardWidth, "%s", smileyFaces[7].c_str());
+
 			Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 			startMenu = false;
 			gameplayMenu = true;
+		} else if(customBoardMenu)
+		{
+			switch(customBoardMenuCursor)
+			{
+				case 0:
+					chosenDifficultyBoardHeight = customBoardMenuInputBuffer;
+					mvprintw(0, 0, "Enter customBoardHeight: %d <   ", chosenDifficultyBoardHeight);
+					break;
+				
+				case 1:
+					chosenDifficultyBoardWidth = customBoardMenuInputBuffer;
+					mvprintw(0, 0, "Enter customBoardWidth: %d <   ", chosenDifficultyBoardWidth);
+					break;
+				
+				case 2:
+					chosenDifficultyBoardMines = customBoardMenuInputBuffer;
+					mvprintw(0, 0, "Enter customBoardMines: %d <   ", chosenDifficultyBoardMines);
+					break;
+
+				case 3:
+					mvprintw(0, 0, "customBoardHeight: %d <        ", chosenDifficultyBoardHeight);
+					mvprintw(1, 0, "customBoardWidth: %d <         ", chosenDifficultyBoardWidth);
+					mvprintw(2, 0, "customBoardMines: %d <         ", chosenDifficultyBoardMines);
+					if(((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
+					{
+						mvprintw(3, 0, "Continue? (y, n)");
+					} else
+					{
+						mvprintw(3, 0, "The following:");
+						mvprintw(4, 0, "    ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) = %d",
+							((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9));
+						mvprintw(5, 0, "Must be equal to or exceed: ");
+						mvprintw(6, 0, "    chosenDifficultyBoardMines = %d", chosenDifficultyBoardMines);
+						mvprintw(7, 0, "Please re-enter values...");
+					}
+					break;
+
+				default:
+					customBoardMenuCursor > 3 ? customBoardMenuCursor = 0 : customBoardMenuCursor = 3;
+					continue;
+			}
+
+			input = getch();
+			if(input == 'q' || input == '`')
+			{
+				break;
+			}
+
+			if(input >= '0' && input <= '9')
+			{
+				if((customBoardMenuInputBuffer * 10) + (input - '0') <= 999)
+				{
+					customBoardMenuInputBuffer *= 10;
+					customBoardMenuInputBuffer += input - '0';
+				}
+			} else if(input == KEY_BACKSPACE && customBoardMenuInputBuffer > 0)
+			{
+				customBoardMenuInputBuffer /= 10;
+			} else if(input == KEY_DOWN || input == KEY_RIGHT)
+			{
+				customBoardMenuCursor++;
+				if(customBoardMenuCursor == 0)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
+				} else if(customBoardMenuCursor == 1)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
+				} else if(customBoardMenuCursor == 2)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
+				} else
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
+				}
+				clear();
+			} else if(input == KEY_UP || input == KEY_LEFT)
+			{
+				customBoardMenuCursor--;
+				if(customBoardMenuCursor == 0)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
+				} else if(customBoardMenuCursor == 1)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
+				} else if(customBoardMenuCursor == 2)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
+				}
+				clear();
+			} else if(input == 'y')
+			{
+				if(customBoardMenuCursor == 3
+				&& ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
+				{
+					clear();
+					customBoardMenu = false;
+					gameplayMenu = true;
+					Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+				}
+			} else if(customBoardMenuCursor == 3)
+			{
+				customBoardMenuCursor++;
+				if(customBoardMenuCursor == 0)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
+				} else if(customBoardMenuCursor == 1)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
+				} else if(customBoardMenuCursor == 2)
+				{
+					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
+				}
+				clear();
+			}
 		} else if(pauseMenu)
 		{
 
@@ -262,21 +380,27 @@ int main()
 			if(screenHeight != previousScreenHeight || screenWidth != previousScreenWidth)
 			{
 				clear();
+				initialSmileyFacesHasBeenPrinted = false;
 			}
 			previousScreenHeight = screenHeight;
 			previousScreenWidth = screenWidth;
 
 			boardTopPadding = (screenHeight / 2) - (chosenDifficultyBoardHeight / 2);
 			boardLeftPadding = (screenWidth / 2) - (chosenDifficultyBoardWidth / 2);
-			smileyFaceInformationTopPadding = boardTopPadding + 0;
-			smileyFaceInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			chosenDifficultyInformationTopPadding = boardTopPadding + 1;
+			smileyFaceInformationTopPadding = boardTopPadding - 2;
+			smileyFaceInformationLeftPadding = (chosenDifficultyBoardWidth / 2) + boardLeftPadding - 1;
+			chosenDifficultyInformationTopPadding = boardTopPadding + 0;
 			chosenDifficultyInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameOverInformationTopPadding = boardTopPadding + 2;
+			gameOverInformationTopPadding = boardTopPadding + 1;
 			gameOverInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameWonInformationTopPadding = boardTopPadding + 2;
+			gameWonInformationTopPadding = boardTopPadding + 1;
 			gameWonInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 
+			if(!initialSmileyFacesHasBeenPrinted)
+			{
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[7].c_str());
+				initialSmileyFacesHasBeenPrinted = true;
+			}
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 			mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
 			switch(chosenDifficulty)
@@ -375,14 +499,14 @@ int main()
 							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+----------+");
-							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|game over!|");
-							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "+----------+");
+							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+============================+");
+							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|         game over!         |");
+							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click anywhere to restart. |");
+							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "+----------------------------+");
 							getch();
 							break;
 						}
 					}
-
 				}
 
 				if(mouseEvent.bstate &BUTTON3_RELEASED)
@@ -419,9 +543,10 @@ int main()
 			{
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+--------+");
-				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|you won!|");
-				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "+--------+");
+				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==============================+");
+				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|           you won!           |");
+				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| click anywhere to play again |");
+				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+------------------------------+");
 				getch();
 				break;
 			}

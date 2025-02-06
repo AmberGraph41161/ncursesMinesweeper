@@ -22,7 +22,7 @@ namespace Mines
 
 	int RANDOM(int minimum, int maximum);
 	void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, BoardCharSet &boardCharSet);
-	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet);
+	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet, bool keepThreeByThreeSafeSpaceAroundCursor = true);
 	void initializeNumbers(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet);
 	bool clearBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet); //returns true if didn't hit mine
 	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet);

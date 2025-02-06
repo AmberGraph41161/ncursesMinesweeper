@@ -26,22 +26,36 @@ namespace Mines
 		}
 	}
 	
-	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet)
+	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet, bool keepThreeByThreeSafeSpaceAroundCursor)
 	{
 		for(int x = 0; x < boardMines; x++)
 		{
 			int randomSpotY = RANDOM(0, board.size() - 1);
 			int randomSpotX = RANDOM(0, board[0].size() - 1);
-
-			if((randomSpotY >= clickedY - 1 && randomSpotY <= clickedY + 1
-			&& randomSpotX >= clickedX - 1 && randomSpotX <= clickedX + 1)
-			|| (board[randomSpotY][randomSpotX].actualChar ==  boardCharSet.mineChar)
-			)
+			
+			if(keepThreeByThreeSafeSpaceAroundCursor)
 			{
-				x--;
+				if((randomSpotY >= clickedY - 1 && randomSpotY <= clickedY + 1
+				&& randomSpotX >= clickedX - 1 && randomSpotX <= clickedX + 1)
+				|| (board[randomSpotY][randomSpotX].actualChar ==  boardCharSet.mineChar)
+				)
+				{
+					x--;
+				} else
+				{
+					board[randomSpotY][randomSpotX].actualChar = boardCharSet.mineChar;
+				}
 			} else
 			{
-				board[randomSpotY][randomSpotX].actualChar = boardCharSet.mineChar;
+				if(randomSpotY == clickedY && randomSpotX == clickedX
+				|| (board[randomSpotY][randomSpotX].actualChar == boardCharSet.mineChar)
+				)
+				{
+					x--;
+				} else
+				{
+					board[randomSpotY][randomSpotX].actualChar = boardCharSet.mineChar;
+				}
 			}
 		}
 	}
