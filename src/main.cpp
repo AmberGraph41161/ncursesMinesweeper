@@ -271,48 +271,36 @@ int main()
 			}
 		} else if(customBoardMenu)
 		{
+			getmaxyx(stdscr, screenHeight, screenWidth);
+			attron(COLOR_PAIR(3));
+			mvprintw(0, 0, "(page %d/3) ", customBoardMenuCursor);
+			attroff(COLOR_PAIR(3));
+			attron(COLOR_PAIR(6));
+			printw("[use arrow keys to move to next page] ");
+			attroff(COLOR_PAIR(6));
+			attron(COLOR_PAIR(1));
+			printw("[screenHeight: %d, screenWidth: %d]", screenHeight, screenWidth);
+			attroff(COLOR_PAIR(1));
+			printw("          ");
+
 			switch(customBoardMenuCursor)
 			{
 				case 0:
 					chosenDifficultyBoardHeight = customBoardMenuInputBuffer;
-					attron(COLOR_PAIR(3));
-					mvprintw(0, 0, "(page 0/3) ");
-					attroff(COLOR_PAIR(3));
-					attron(COLOR_PAIR(6));
-					printw("[use arrow keys to move to next page]");
-					attroff(COLOR_PAIR(6));
 					mvprintw(1, 0, "Enter customBoardHeight: %d <   ", chosenDifficultyBoardHeight);
 					break;
 
 				case 1:
 					chosenDifficultyBoardWidth = customBoardMenuInputBuffer;
-					attron(COLOR_PAIR(3));
-					mvprintw(0, 0, "(page 1/3) ");
-					attroff(COLOR_PAIR(3));
-					attron(COLOR_PAIR(6));
-					printw("[use arrow keys to move to next page]");
-					attroff(COLOR_PAIR(6));
 					mvprintw(1, 0, "Enter customBoardWidth: %d <   ", chosenDifficultyBoardWidth);
 					break;
 				
 				case 2:
 					chosenDifficultyBoardMines = customBoardMenuInputBuffer;
-					attron(COLOR_PAIR(3));
-					mvprintw(0, 0, "(page 2/3) ");
-					attroff(COLOR_PAIR(3));
-					attron(COLOR_PAIR(6));
-					printw("[use arrow keys to move to next page]");
-					attroff(COLOR_PAIR(6));
 					mvprintw(1, 0, "Enter customBoardMines: %d <   ", chosenDifficultyBoardMines);
 					break;
 
 				case 3:
-					attron(COLOR_PAIR(3));
-					mvprintw(0, 0, "(page 3/3) ");
-					attroff(COLOR_PAIR(3));
-					attron(COLOR_PAIR(6));
-					printw("[use arrow keys to move to next page]");
-					attroff(COLOR_PAIR(6));
 					mvprintw(1, 0, "customBoardHeight: %d <        ", chosenDifficultyBoardHeight);
 					mvprintw(2, 0, "customBoardWidth: %d <         ", chosenDifficultyBoardWidth);
 					mvprintw(3, 0, "customBoardMines: %d <         ", chosenDifficultyBoardMines);
