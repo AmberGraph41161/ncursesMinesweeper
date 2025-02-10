@@ -552,7 +552,7 @@ int main()
 			}
 		}
 	}
-	getch();
+	//getch();
 
 	endwin();
 	return 0;

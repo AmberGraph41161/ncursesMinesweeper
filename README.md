@@ -4,6 +4,10 @@
 
 > Note that this is meant to be played with the mouse (even though it's run in the terminal)
 
+### Controls
+
+Please use the mouse use. Keyboard support isn't fully implemented
+
 # Please view only
 
 This project is available for **viewing only**.

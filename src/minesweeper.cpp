@@ -47,7 +47,7 @@ namespace Mines
 				}
 			} else
 			{
-				if(randomSpotY == clickedY && randomSpotX == clickedX
+				if((randomSpotY == clickedY && randomSpotX == clickedX)
 				|| (board[randomSpotY][randomSpotX].actualChar == boardCharSet.mineChar)
 				)
 				{
