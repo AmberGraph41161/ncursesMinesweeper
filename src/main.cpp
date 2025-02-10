@@ -246,16 +246,19 @@ int main()
 					continue;
 
 				default:
-					chosenDifficultyBoardHeight = easyBoardHeight;
-					chosenDifficultyBoardWidth = easyBoardWidth;
-					chosenDifficultyBoardMines = easyBoardMines;
-					chosenDifficulty = easyBoardDifficulty;
+					chosenDifficultyBoardHeight = -1;
+					chosenDifficultyBoardWidth = -1;
+					chosenDifficultyBoardMines = -1;
+					chosenDifficulty = -1;
 					break;
 			}
 
-			Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
-			startMenu = false;
-			gameplayMenu = true;
+			if(chosenDifficulty != -1)
+			{
+				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+				startMenu = false;
+				gameplayMenu = true;
+			}
 		} else if(customBoardMenu)
 		{
 			switch(customBoardMenuCursor)
@@ -433,6 +436,12 @@ int main()
 			}
 
 			input = getch();
+			if(input == 'r' && gameOver)
+			{
+				gameplayMenu = false;
+				continue;
+			}
+
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
 			{
 				clickedY = mouseEvent.y - boardTopPadding;
@@ -499,12 +508,10 @@ int main()
 							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+============================+");
-							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|         game over!         |");
-							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click anywhere to restart. |");
-							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "+----------------------------+");
-							getch();
-							break;
+							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+======================+");
+							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|      game over!      |");
+							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click 'r' to restart |");
+							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "+----------------------+");
 						}
 					}
 				}
@@ -530,26 +537,28 @@ int main()
 				break;
 			}
 
-			//temp debug controls as of Friday, January 31, 2025, 10:55:51
-			if(input == 'r')
-			{
-				Mines::revealWholeBoard(board, boardCharSet);
-			} else if (input == 'R')
-			{
-				Mines::revealWholeBoard(board, boardCharSet, false);
-			}
-
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==============================+");
-				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|           you won!           |");
-				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| click anywhere to play again |");
-				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+------------------------------+");
-				getch();
-				break;
+				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
+				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
+				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| click 'r' to play again! |");
+				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+--------------------------+");
 			}
+		} else
+		{
+			//reset game here
+			gameOver = false;
+
+			startMenu = true;
+			haveNotInitializedMinesYet = true;
+			
+			//customBoardMenu = false;
+			//pauseMenu = false;
+			//gameplayMenu = false;
+
+			board.clear();
 		}
 	}
 	//getch();
