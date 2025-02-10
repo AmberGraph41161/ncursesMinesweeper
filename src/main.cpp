@@ -275,34 +275,68 @@ int main()
 			{
 				case 0:
 					chosenDifficultyBoardHeight = customBoardMenuInputBuffer;
-					mvprintw(0, 0, "Enter customBoardHeight: %d <   ", chosenDifficultyBoardHeight);
+					attron(COLOR_PAIR(3));
+					mvprintw(0, 0, "(page 0/3) ");
+					attroff(COLOR_PAIR(3));
+					attron(COLOR_PAIR(6));
+					printw("[use arrow keys to move to next page]");
+					attroff(COLOR_PAIR(6));
+					mvprintw(1, 0, "Enter customBoardHeight: %d <   ", chosenDifficultyBoardHeight);
 					break;
-				
+
 				case 1:
 					chosenDifficultyBoardWidth = customBoardMenuInputBuffer;
-					mvprintw(0, 0, "Enter customBoardWidth: %d <   ", chosenDifficultyBoardWidth);
+					attron(COLOR_PAIR(3));
+					mvprintw(0, 0, "(page 1/3) ");
+					attroff(COLOR_PAIR(3));
+					attron(COLOR_PAIR(6));
+					printw("[use arrow keys to move to next page]");
+					attroff(COLOR_PAIR(6));
+					mvprintw(1, 0, "Enter customBoardWidth: %d <   ", chosenDifficultyBoardWidth);
 					break;
 				
 				case 2:
 					chosenDifficultyBoardMines = customBoardMenuInputBuffer;
-					mvprintw(0, 0, "Enter customBoardMines: %d <   ", chosenDifficultyBoardMines);
+					attron(COLOR_PAIR(3));
+					mvprintw(0, 0, "(page 2/3) ");
+					attroff(COLOR_PAIR(3));
+					attron(COLOR_PAIR(6));
+					printw("[use arrow keys to move to next page]");
+					attroff(COLOR_PAIR(6));
+					mvprintw(1, 0, "Enter customBoardMines: %d <   ", chosenDifficultyBoardMines);
 					break;
 
 				case 3:
-					mvprintw(0, 0, "customBoardHeight: %d <        ", chosenDifficultyBoardHeight);
-					mvprintw(1, 0, "customBoardWidth: %d <         ", chosenDifficultyBoardWidth);
-					mvprintw(2, 0, "customBoardMines: %d <         ", chosenDifficultyBoardMines);
+					attron(COLOR_PAIR(3));
+					mvprintw(0, 0, "(page 3/3) ");
+					attroff(COLOR_PAIR(3));
+					attron(COLOR_PAIR(6));
+					printw("[use arrow keys to move to next page]");
+					attroff(COLOR_PAIR(6));
+					mvprintw(1, 0, "customBoardHeight: %d <        ", chosenDifficultyBoardHeight);
+					mvprintw(2, 0, "customBoardWidth: %d <         ", chosenDifficultyBoardWidth);
+					mvprintw(3, 0, "customBoardMines: %d <         ", chosenDifficultyBoardMines);
 					if(((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
 					{
-						mvprintw(3, 0, "Continue? (y, n)");
+						attron(COLOR_PAIR(2));
+						mvprintw(4, 0, "Continue? (y, n)");
+						attroff(COLOR_PAIR(2));
 					} else
 					{
-						mvprintw(3, 0, "The following:");
-						mvprintw(4, 0, "    ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) = %d",
+						attron(COLOR_PAIR(6));
+						mvprintw(5, 0, "The following:");
+						attroff(COLOR_PAIR(6));
+						mvprintw(6, 0, "    ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) = %d",
 							((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9));
-						mvprintw(5, 0, "Must be equal to or exceed: ");
-						mvprintw(6, 0, "    chosenDifficultyBoardMines = %d", chosenDifficultyBoardMines);
-						mvprintw(7, 0, "Please re-enter values...");
+						attron(COLOR_PAIR(6));
+
+						mvprintw(8, 0, "Must be equal to or exceed: ");
+						attroff(COLOR_PAIR(6));
+						mvprintw(9, 0, "    chosenDifficultyBoardMines = %d", chosenDifficultyBoardMines);
+
+						attron(COLOR_PAIR(6));
+						mvprintw(11, 0, "Please re-enter values...");
+						attroff(COLOR_PAIR(6));
 					}
 					break;
 
