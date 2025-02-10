@@ -2,7 +2,9 @@
 #include <chrono>
 #include <cstdlib>
 #include <ncurses.h>
+#include <system_error>
 #include <vector>
+#include <array>
 
 #include "minesweeper.hpp"
 
@@ -137,7 +139,7 @@ int main()
 	int chosenDifficultyBoardMines = 0;
 
 	bool initialSmileyFacesHasBeenPrinted = false;
-	std::vector<std::string> smileyFaces =
+	std::array<std::string, 8> smileyFaces =
 	{
 		":o", //0 left pressed
 		":3", //1 left held to flag
@@ -153,6 +155,8 @@ int main()
 	int boardTopPadding = 0;
 	int smileyFaceInformationTopPadding = 0;
 	int smileyFaceInformationLeftPadding = 0;
+	int gameTimeElapsedInformationTopPadding = 0;
+	int gameTimeElapsedInformationLeftPadding = 0;
 	int chosenDifficultyInformationTopPadding = 0;
 	int chosenDifficultyInformationLeftPadding = 0;
 	int gameOverInformationTopPadding = 0;
@@ -163,6 +167,10 @@ int main()
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
 	bool haveNotInitializedMinesYet = true;
+
+	std::chrono::time_point<std::chrono::system_clock> gameStartTime;
+	std::chrono::time_point<std::chrono::system_clock> gameEndTime;
+	std::chrono::duration<double> gameTimeElapsed;
 
 	int screenHeight = 0;
 	int screenWidth = 0;
@@ -259,6 +267,8 @@ int main()
 				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 				startMenu = false;
 				gameplayMenu = true;
+				gameStartTime = std::chrono::high_resolution_clock::now();
+				nodelay(stdscr, TRUE);
 			}
 		} else if(customBoardMenu)
 		{
@@ -358,6 +368,8 @@ int main()
 					customBoardMenu = false;
 					gameplayMenu = true;
 					Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+					gameStartTime = std::chrono::high_resolution_clock::now();
+					nodelay(stdscr, TRUE);
 				}
 			} else if(customBoardMenuCursor == 3)
 			{
@@ -379,6 +391,12 @@ int main()
 
 		} else if(gameplayMenu)
 		{
+			if(!gameOver)
+			{
+				gameEndTime = std::chrono::high_resolution_clock::now();
+				gameTimeElapsed = gameEndTime - gameStartTime;
+			}
+
 			//center information padding
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			if(screenHeight != previousScreenHeight || screenWidth != previousScreenWidth)
@@ -393,11 +411,13 @@ int main()
 			boardLeftPadding = (screenWidth / 2) - (chosenDifficultyBoardWidth / 2);
 			smileyFaceInformationTopPadding = boardTopPadding - 2;
 			smileyFaceInformationLeftPadding = (chosenDifficultyBoardWidth / 2) + boardLeftPadding - 1;
-			chosenDifficultyInformationTopPadding = boardTopPadding + 0;
+			gameTimeElapsedInformationTopPadding = boardTopPadding + 0;
+			gameTimeElapsedInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
+			chosenDifficultyInformationTopPadding = boardTopPadding + 1;
 			chosenDifficultyInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameOverInformationTopPadding = boardTopPadding + 1;
+			gameOverInformationTopPadding = boardTopPadding + 2;
 			gameOverInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameWonInformationTopPadding = boardTopPadding + 1;
+			gameWonInformationTopPadding = boardTopPadding + 2;
 			gameWonInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 
 			if(!initialSmileyFacesHasBeenPrinted)
@@ -435,8 +455,19 @@ int main()
 					attroff(COLOR_PAIR(7));
 					break;
 			}
+			mvprintw(gameTimeElapsedInformationTopPadding, gameTimeElapsedInformationLeftPadding, "Elapsed Time: %f", gameTimeElapsed.count());
 
 			input = getch();
+			if(input == ERR)
+			{
+				continue;
+			}
+
+			if(input == 'q' || input == '`')
+			{
+				break;
+			}
+
 			if(gameOver)
 			{
 				if(input == 'r')
@@ -589,11 +620,6 @@ int main()
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
 			}
 
-			if(input == '`' || input == 'q')
-			{
-				break;
-			}
-
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
@@ -616,6 +642,7 @@ int main()
 			//gameplayMenu = false;
 
 			board.clear();
+			raw();
 		}
 	}
 	//getch();
