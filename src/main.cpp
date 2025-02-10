@@ -93,7 +93,9 @@ int main()
 	const int backgroundColorGray = CUSTOM_COLOR_TEN;
 	const int backgroundColorBlack = COLOR_BLACK;
 	const int backgroundColorTransparent = -1; 
-	int backgroundColor = backgroundColorGray;
+	//int backgroundColor = backgroundColorGray;
+	//int backgroundColor = backgroundColorWhite;
+	int backgroundColor = backgroundColorBlack;
 
 	init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
 	init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
@@ -440,7 +442,6 @@ int main()
 				if(input == 'r')
 				{
 					gameplayMenu = false;
-					continue;
 				} else if(input == '1')
 				{
 					//Mines::revealWholeBoard(board, boardCharSet);
@@ -449,6 +450,51 @@ int main()
 				{
 					Mines::revealWholeBoard(board, boardCharSet, false);
 				}
+				continue;
+			}
+
+			if(input == 'z')
+			{
+				int backgroundColor = backgroundColorWhite;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
+			} else if(input == 'x')
+			{
+				int backgroundColor = backgroundColorGray;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
+			} else if(input == 'c')
+			{
+				int backgroundColor = backgroundColorBlack;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
 			}
 
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
