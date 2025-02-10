@@ -2,7 +2,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <ncurses.h>
-#include <system_error>
 #include <vector>
 #include <array>
 
@@ -642,7 +641,8 @@ int main()
 			//gameplayMenu = false;
 
 			board.clear();
-			raw();
+			nodelay(stdscr, FALSE);
+			raw(); //calling this too just in case...? might be unnecessary
 		}
 	}
 	//getch();
