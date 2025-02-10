@@ -250,6 +250,20 @@ namespace Mines
 		}
 	}
 
+	void revealOnlyMines(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet)
+	{
+		for(int y = 0; y < board.size(); y++)
+		{
+			for(int x = 0; x < board[y].size(); x++)
+			{
+				if(board[y][x].actualChar == boardCharSet.mineChar)
+				{
+					board[y][x].displayChar = board[y][x].actualChar;
+				}
+			}
+		}
+	}
+
 	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
 	{
 		int realFlagCount = 0;

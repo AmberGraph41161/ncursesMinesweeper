@@ -2,7 +2,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <ncurses.h>
-#include <array>
 #include <vector>
 
 #include "minesweeper.hpp"
@@ -436,10 +435,20 @@ int main()
 			}
 
 			input = getch();
-			if(input == 'r' && gameOver)
+			if(gameOver)
 			{
-				gameplayMenu = false;
-				continue;
+				if(input == 'r')
+				{
+					gameplayMenu = false;
+					continue;
+				} else if(input == '1')
+				{
+					//Mines::revealWholeBoard(board, boardCharSet);
+					Mines::revealOnlyMines(board, boardCharSet);
+				} else if(input == '2')
+				{
+					Mines::revealWholeBoard(board, boardCharSet, false);
+				}
 			}
 
 			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
@@ -508,10 +517,12 @@ int main()
 							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+======================+");
-							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|      game over!      |");
-							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click 'r' to restart |");
-							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "+----------------------+");
+							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
+							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
+							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click 'r' to restart             |");
+							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| click '1' to reveal all mines    |");
+							mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| click '2' to reveal entire board |");
+							mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
 						}
 					}
 				}
