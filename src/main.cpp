@@ -657,6 +657,7 @@ int main()
 
 			startMenu = true;
 			haveNotInitializedMinesYet = true;
+			initialSmileyFacesHasBeenPrinted = false;
 			
 			//customBoardMenu = false;
 			//pauseMenu = false;
