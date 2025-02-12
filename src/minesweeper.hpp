@@ -30,6 +30,7 @@ namespace Mines
 	bool clearBoardWhereClickedAroundNumberCell(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet); //returns true if didn't hit mine
 	void revealWholeBoard(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet, bool revealMines = true);
 	void revealOnlyMines(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet);
+	void healBoard(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet);
 	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet);
 }
 

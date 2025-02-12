@@ -27,7 +27,7 @@ init_color(COLOR_RED, 700, 0, 0);
 //do RGB256/256, and get first 3 nums after decimal
 */
 
-void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int &boardTopPadding, int &boardLeftPadding, Mines::BoardCharSet boardCharSet)
+void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int boardTopPadding, int boardLeftPadding, Mines::BoardCharSet boardCharSet)
 {
 	for(int y = 0; y < board.size(); y++)
 	{
@@ -50,7 +50,6 @@ void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board
 		}
 	}
 }
-
 
 int main()
 {
@@ -128,9 +127,20 @@ int main()
 	const int extremeBoardWidth = 30;
 	const int extremeBoardMines = 160;
 	const int customBoardDifficulty = 5;
+	const int changeColorsDifficulty = 6;
 
 	int customBoardMenuCursor = 0;
 	int customBoardMenuInputBuffer = 0;
+
+
+	//DEBUG TEMP VARS
+	int colorone = 0;
+	int colortwo = 0;
+	int colorthree = 0;
+
+	const int changeColorsMenuSampleBoardHeight = 10;
+	const int changeColorsMenuSampleBoardWidth = 10;
+	const int changeColorsMenuSampleBoardMines = 20;
 
 	int chosenDifficulty = easyBoardDifficulty;
 	int chosenDifficultyBoardHeight = 0;
@@ -178,6 +188,7 @@ int main()
 	bool gameOver = false;
 	bool startMenu = true;
 	bool customBoardMenu = false;
+	bool changeColorsMenu = false;
 	bool pauseMenu = false;
 	bool gameplayMenu = false;
 	while(true)
@@ -201,6 +212,9 @@ int main()
 			attron(COLOR_PAIR(7));
 			mvprintw(5, 0, "5. Custom");
 			attroff(COLOR_PAIR(7));
+			attron(COLOR_PAIR(5));
+			mvprintw(6, 0, "6. changeColorsMenu");
+			attroff(COLOR_PAIR(5));
 
 			input = getch();
 			if(input == 'q' || input == '`')
@@ -251,6 +265,10 @@ int main()
 					chosenDifficulty = customBoardDifficulty;
 					break;
 
+				case '6':
+					chosenDifficulty = changeColorsDifficulty;
+					break;
+
 				default:
 					chosenDifficultyBoardHeight = 0;
 					chosenDifficultyBoardWidth = 0;
@@ -263,6 +281,13 @@ int main()
 			{
 				startMenu = false;
 				customBoardMenu = true;
+			} else if(chosenDifficulty == changeColorsDifficulty)
+			{
+				startMenu = false;
+				changeColorsMenu = true;
+				Mines::initializeBoard(board, changeColorsMenuSampleBoardHeight, changeColorsMenuSampleBoardWidth, boardCharSet);
+				Mines::initializeMines(board, changeColorsMenuSampleBoardHeight / 2, changeColorsMenuSampleBoardWidth / 2, changeColorsMenuSampleBoardMines, boardCharSet);
+				Mines::initializeNumbers(board, boardCharSet);
 			} else if(chosenDifficulty != -1)
 			{
 				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
@@ -341,6 +366,14 @@ int main()
 				break;
 			}
 
+			if(input == KEY_BACKSPACE)
+			{
+				chosenDifficulty = -1;
+				customBoardMenu = false;
+				startMenu = true;
+				continue;
+			}
+
 			if(input >= '0' && input <= '9')
 			{
 				if((customBoardMenuInputBuffer * 10) + (input - '0') <= 999)
@@ -409,6 +442,123 @@ int main()
 				}
 				clear();
 			}
+		} else if(changeColorsMenu)
+		{
+			mvprintw(0, 0, "changeColorsMenu");
+			mvprintw(1, 0, "click '1' to reveal all mines");
+			mvprintw(2, 0, "click '2' to reveal entire board");
+			mvprintw(3, 0, "click '3' to heal board");
+			mvprintw(4, 0, "sample output:");
+			drawBoard(stdscr, board, 5, 0, boardCharSet);
+
+			input = getch();
+
+			if(input == 'q' || input == '`')
+			{
+				break;
+			}
+
+			if(input == KEY_BACKSPACE)
+			{
+				chosenDifficulty = -1;
+				changeColorsMenu = false;
+				startMenu = true;
+				board.clear();
+				continue;
+			}
+
+			//TMEP DEBUG CONTROLS
+			if(input == 'i')
+			{
+				colorone++;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			} else if(input == 'j')
+			{
+				colorone--;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			} else if(input == 'o')
+			{
+				colortwo++;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			} else if(input == 'k')
+			{
+				colortwo--;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			} else if(input == 'p')
+			{
+				colorthree++;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			} else if(input == 'l')
+			{
+				colorthree--;
+				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			}
+
+			if(input == 'z')
+			{
+				int backgroundColor = backgroundColorWhite;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
+			} else if(input == 'x')
+			{
+				int backgroundColor = backgroundColorGray;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
+			} else if(input == 'c')
+			{
+				int backgroundColor = backgroundColorBlack;
+
+				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+				continue;
+			}
+
+			if(input == '1')
+			{
+				//Mines::revealWholeBoard(board, boardCharSet);
+				Mines::revealOnlyMines(board, boardCharSet);
+			} else if(input == '2')
+			{
+				Mines::revealWholeBoard(board, boardCharSet, false);
+			} else if(input == '3')
+			{
+				Mines::healBoard(board, boardCharSet);
+			}
+			continue;
+
+
+
 		} else if(pauseMenu)
 		{
 
@@ -504,50 +654,6 @@ int main()
 				{
 					Mines::revealWholeBoard(board, boardCharSet, false);
 				}
-				continue;
-			}
-
-			if(input == 'z')
-			{
-				int backgroundColor = backgroundColorWhite;
-
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
-				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
-				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
-				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
-				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
-				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
-				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
-				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
-				continue;
-			} else if(input == 'x')
-			{
-				int backgroundColor = backgroundColorGray;
-
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
-				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
-				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
-				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
-				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
-				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
-				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
-				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
-				continue;
-			} else if(input == 'c')
-			{
-				int backgroundColor = backgroundColorBlack;
-
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-				init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
-				init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
-				init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
-				init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
-				init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
-				init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
-				init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
-				init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
 				continue;
 			}
 

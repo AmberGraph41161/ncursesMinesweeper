@@ -264,6 +264,17 @@ namespace Mines
 		}
 	}
 
+	void healBoard(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet)
+	{
+		for(int y = 0; y < board.size(); y++)
+		{
+			for(int x = 0; x < board[y].size(); x++)
+			{
+				board[y][x].displayChar = boardCharSet.filledChar;
+			}
+		}
+	}
+
 	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
 	{
 		int realFlagCount = 0;
