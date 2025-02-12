@@ -248,20 +248,22 @@ int main()
 					break;
 
 				case '5':
-					startMenu = false;
-					customBoardMenu = true;
 					chosenDifficulty = customBoardDifficulty;
 					break;
 
 				default:
-					chosenDifficultyBoardHeight = -1;
-					chosenDifficultyBoardWidth = -1;
-					chosenDifficultyBoardMines = -1;
+					chosenDifficultyBoardHeight = 0;
+					chosenDifficultyBoardWidth = 0;
+					chosenDifficultyBoardMines = 0;
 					chosenDifficulty = -1;
 					break;
 			}
 
-			if(chosenDifficulty != -1 && chosenDifficulty != customBoardDifficulty)
+			if(chosenDifficulty == customBoardDifficulty)
+			{
+				startMenu = false;
+				customBoardMenu = true;
+			} else if(chosenDifficulty != -1)
 			{
 				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 				startMenu = false;
