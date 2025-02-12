@@ -248,10 +248,10 @@ int main()
 					break;
 
 				case '5':
-					chosenDifficulty = customBoardDifficulty;
 					startMenu = false;
 					customBoardMenu = true;
-					continue;
+					chosenDifficulty = customBoardDifficulty;
+					break;
 
 				default:
 					chosenDifficultyBoardHeight = -1;
@@ -261,7 +261,7 @@ int main()
 					break;
 			}
 
-			if(chosenDifficulty != -1)
+			if(chosenDifficulty != -1 && chosenDifficulty != customBoardDifficulty)
 			{
 				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
 				startMenu = false;
