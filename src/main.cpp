@@ -27,6 +27,15 @@ init_color(COLOR_RED, 700, 0, 0);
 //do RGB256/256, and get first 3 nums after decimal
 */
 
+struct Triple
+{
+	Triple(int r, int g, int b) : red(r), green(g), blue(b) {}
+
+	int red = 0;
+	int green = 0;
+	int blue = 0;
+};
+
 void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int boardTopPadding, int boardLeftPadding, Mines::BoardCharSet boardCharSet)
 {
 	for(int y = 0; y < board.size(); y++)
@@ -77,6 +86,27 @@ int main()
 	}
 	start_color();
 	use_default_colors(); //allows for -1 for transparent background
+
+	const Triple defaultColorOne = { 0, 0, 996 };
+	const Triple defaultColorTwo = { 0, 507, 0 };
+	const Triple defaultColorThree = { 992, 0, 0 };
+	const Triple defaultColorFour = { 0, 0, 515 };
+	const Triple defaultColorFive = { 515, 0, 0 };
+	const Triple defaultColorSix = { 0, 507, 515 };
+	const Triple defaultColorSeven = { 515, 0, 515 };
+	const Triple defaultColorEight = { 457, 457, 457 };
+
+	std::array<Triple, 8> numberColors =
+	{
+		Triple(0, 0, 996),
+		Triple(0, 507, 0),
+		Triple(992, 0, 0),
+		Triple(0, 0, 515),
+		Triple(515, 0, 0),
+		Triple(0, 507, 515),
+		Triple(515, 0, 515),
+		Triple(457, 457, 457),
+	};
 
 	init_color(CUSTOM_COLOR_ONE, 0, 0, 996);
 	init_color(CUSTOM_COLOR_TWO, 0, 507, 0);
@@ -132,15 +162,14 @@ int main()
 	int customBoardMenuCursor = 0;
 	int customBoardMenuInputBuffer = 0;
 
-
 	//DEBUG TEMP VARS
 	int colorone = 0;
 	int colortwo = 0;
 	int colorthree = 0;
 
-	const int changeColorsMenuSampleBoardHeight = 10;
-	const int changeColorsMenuSampleBoardWidth = 10;
-	const int changeColorsMenuSampleBoardMines = 20;
+	int changeColorsMenuSelectedColorToModify = 0;
+	int changeColorsMenuSelectedNumber = '1';
+	std::vector<std::vector<Mines::BoardCell>> changeColorsMenuSampleBoard;
 
 	int chosenDifficulty = easyBoardDifficulty;
 	int chosenDifficultyBoardHeight = 0;
@@ -283,11 +312,18 @@ int main()
 				customBoardMenu = true;
 			} else if(chosenDifficulty == changeColorsDifficulty)
 			{
+				Mines::initializeBoard(changeColorsMenuSampleBoard, 2, 9, boardCharSet);
+				for(int x = 1; x <= 8; x++)
+				{
+					changeColorsMenuSampleBoard[0][x].actualChar = x + '0';
+				}
+				for(int x = 0; x < 9; x++)
+				{
+					changeColorsMenuSampleBoard[1][x].actualChar = boardCharSet.mineChar;
+				}
+				Mines::revealWholeBoard(changeColorsMenuSampleBoard, boardCharSet, true);
 				startMenu = false;
 				changeColorsMenu = true;
-				Mines::initializeBoard(board, changeColorsMenuSampleBoardHeight, changeColorsMenuSampleBoardWidth, boardCharSet);
-				Mines::initializeMines(board, changeColorsMenuSampleBoardHeight / 2, changeColorsMenuSampleBoardWidth / 2, changeColorsMenuSampleBoardMines, boardCharSet);
-				Mines::initializeNumbers(board, boardCharSet);
 			} else if(chosenDifficulty != -1)
 			{
 				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
@@ -302,6 +338,9 @@ int main()
 			attron(COLOR_PAIR(3));
 			mvprintw(0, 0, "(page %d/3) ", customBoardMenuCursor);
 			attroff(COLOR_PAIR(3));
+			attron(COLOR_PAIR(2));
+			printw("[hit '\\' to go back] ");
+			attroff(COLOR_PAIR(2));
 			attron(COLOR_PAIR(6));
 			printw("[use arrow keys to move to next page] ");
 			attroff(COLOR_PAIR(6));
@@ -366,7 +405,7 @@ int main()
 				break;
 			}
 
-			if(input == KEY_BACKSPACE)
+			if(input == '\\') 
 			{
 				chosenDifficulty = -1;
 				customBoardMenu = false;
@@ -381,7 +420,7 @@ int main()
 					customBoardMenuInputBuffer *= 10;
 					customBoardMenuInputBuffer += input - '0';
 				}
-			} else if(input == KEY_BACKSPACE && customBoardMenuInputBuffer > 0)
+			} else if(input == '\\' && customBoardMenuInputBuffer > 0)
 			{
 				customBoardMenuInputBuffer /= 10;
 			} else if(input == KEY_DOWN || input == KEY_RIGHT)
@@ -444,21 +483,43 @@ int main()
 			}
 		} else if(changeColorsMenu)
 		{
-			mvprintw(0, 0, "changeColorsMenu");
-			mvprintw(1, 0, "click '1' to reveal all mines");
-			mvprintw(2, 0, "click '2' to reveal entire board");
-			mvprintw(3, 0, "click '3' to heal board");
-			mvprintw(4, 0, "sample output:");
-			drawBoard(stdscr, board, 5, 0, boardCharSet);
+			attron(COLOR_PAIR(6));
+			mvprintw(0, 0, "changeColorsMenu [hit '\\' to go back]");
+			attroff(COLOR_PAIR(6));
+			mvprintw(1, 0, "press '!' to reveal all mines");
+			mvprintw(2, 0, "press '@' to reveal entire board");
+			mvprintw(3, 0, "press '#' to heal board");
+			mvprintw(4, 0, "press '0'-'8' to select number color to modify");
+
+			mvprintw(6, 0, "selected number color to modify: %c", changeColorsMenuSelectedNumber);
+			mvprintw(7, 0, "press 'r' to modify selected number R: %03d value (between 0-999)",
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].red);
+				changeColorsMenuSelectedColorToModify == 1 ? printw(" < (enter to confirm)") : printw("                     ");
+			mvprintw(8, 0, "press 'g' to modify selected number G: %03d value (between 0-999)",
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].green);
+				changeColorsMenuSelectedColorToModify == 2 ? printw(" < (enter to confirm)") : printw("                     ");
+			mvprintw(9, 0, "press 'b' to modify selected number B: %03d value (between 0-999)",
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue);
+				changeColorsMenuSelectedColorToModify == 3 ? printw(" < (enter to confirm)") : printw("                     ");
+			/*
+			mvprintw(11, 0, "R: %03d, G: %03d, B: %03d",
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].red,
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].green,
+				numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue);
+			*/
+			drawBoard(stdscr, changeColorsMenuSampleBoard, 11, 0, boardCharSet);
 
 			input = getch();
-
+			if(input == ERR)
+			{
+				continue;
+			}
 			if(input == 'q' || input == '`')
 			{
 				break;
 			}
 
-			if(input == KEY_BACKSPACE)
+			if(input == '\\')
 			{
 				chosenDifficulty = -1;
 				changeColorsMenu = false;
@@ -467,38 +528,89 @@ int main()
 				continue;
 			}
 
-			//TMEP DEBUG CONTROLS
-			if(input == 'i')
+			if(input == 'r')
 			{
-				colorone++;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			} else if(input == 'j')
+				changeColorsMenuSelectedColorToModify = 1;
+			} else if(input == 'g')
 			{
-				colorone--;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			} else if(input == 'o')
+				changeColorsMenuSelectedColorToModify = 2;
+			} else if(input == 'b')
 			{
-				colortwo++;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			} else if(input == 'k')
+				changeColorsMenuSelectedColorToModify = 3;
+			} else if(input == '\n')
 			{
-				colortwo--;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			} else if(input == 'p')
-			{
-				colorthree++;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			} else if(input == 'l')
-			{
-				colorthree--;
-				init_color(CUSTOM_COLOR_ONE, colorone, colortwo, colorthree);
-				init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+				changeColorsMenuSelectedColorToModify = 0;
 			}
+
+			if(changeColorsMenuSelectedColorToModify == 0 && input >= '1' && input <= '8')
+			{
+				changeColorsMenuSelectedNumber = input;
+			} else if(changeColorsMenuSelectedColorToModify)
+			{
+				if(input >= '0' && input <= '9')
+				{
+					if(changeColorsMenuSelectedColorToModify == 1)
+					{
+						if((numberColors[changeColorsMenuSelectedNumber - '0' - 1].red * 10) + (input - '0') <= 999)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].red *= 10;
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].red += input - '0';
+						}
+					} else if(changeColorsMenuSelectedColorToModify == 2)
+					{
+						if((numberColors[changeColorsMenuSelectedNumber - '0' - 1].green * 10) + (input - '0') <= 999)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].green *= 10;
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].green += input - '0';
+						}
+					} else if(changeColorsMenuSelectedColorToModify == 3)
+					{
+						if((numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue * 10) + (input - '0') <= 999)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue *= 10;
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue += input - '0';
+						}
+					}
+				} else if(input == KEY_BACKSPACE)
+				{
+					if(changeColorsMenuSelectedColorToModify == 1)
+					{
+						if(numberColors[changeColorsMenuSelectedNumber - '0' - 1].red > 0)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].red /= 10;
+						}
+					} else if(changeColorsMenuSelectedColorToModify == 2)
+					{
+						if(numberColors[changeColorsMenuSelectedNumber - '0' - 1].green > 0)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].green /= 10;
+						}
+					} else if(changeColorsMenuSelectedColorToModify == 3)
+					{
+						if(numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue > 0)
+						{
+							numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue /= 10;
+						}
+					}
+				}
+			}
+
+			init_color(CUSTOM_COLOR_ONE, numberColors[0].red, numberColors[0].green, numberColors[0].blue);
+			init_color(CUSTOM_COLOR_TWO, numberColors[1].red, numberColors[1].green, numberColors[1].blue);
+			init_color(CUSTOM_COLOR_THREE, numberColors[2].red, numberColors[2].green, numberColors[2].blue);
+			init_color(CUSTOM_COLOR_FOUR, numberColors[3].red, numberColors[3].green, numberColors[3].blue);
+			init_color(CUSTOM_COLOR_FIVE, numberColors[4].red, numberColors[4].green, numberColors[4].blue);
+			init_color(CUSTOM_COLOR_SIX, numberColors[5].red, numberColors[5].green, numberColors[5].blue);
+			init_color(CUSTOM_COLOR_SEVEN, numberColors[6].red, numberColors[6].green, numberColors[6].blue);
+			init_color(CUSTOM_COLOR_EIGHT, numberColors[7].red, numberColors[7].green, numberColors[7].blue);
+			init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+			init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+			init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+			init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+			init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+			init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+			init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
 
 			if(input == 'z')
 			{
@@ -544,21 +656,17 @@ int main()
 				continue;
 			}
 
-			if(input == '1')
+			if(input == '!')
 			{
 				//Mines::revealWholeBoard(board, boardCharSet);
-				Mines::revealOnlyMines(board, boardCharSet);
-			} else if(input == '2')
+				Mines::revealOnlyMines(changeColorsMenuSampleBoard, boardCharSet);
+			} else if(input == '@')
 			{
-				Mines::revealWholeBoard(board, boardCharSet, false);
-			} else if(input == '3')
+				Mines::revealWholeBoard(changeColorsMenuSampleBoard, boardCharSet, false);
+			} else if(input == '#')
 			{
-				Mines::healBoard(board, boardCharSet);
+				Mines::healBoard(changeColorsMenuSampleBoard, boardCharSet);
 			}
-			continue;
-
-
-
 		} else if(pauseMenu)
 		{
 
@@ -725,9 +833,9 @@ int main()
 							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
 							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
-							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| click 'r' to restart             |");
-							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| click '1' to reveal all mines    |");
-							mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| click '2' to reveal entire board |");
+							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| press 'r' to restart             |");
+							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| press '1' to reveal all mines    |");
+							mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
 							mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
 						}
 					}
@@ -755,7 +863,7 @@ int main()
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
 				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
-				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| click 'r' to play again! |");
+				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| press 'r' to play again! |");
 				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+--------------------------+");
 			}
 		} else
