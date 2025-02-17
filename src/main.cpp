@@ -176,16 +176,17 @@ int main()
 	int chosenDifficultyBoardMines = 0;
 
 	bool initialSmileyFacesHasBeenPrinted = false;
-	std::array<std::string, 8> smileyFaces =
+	std::array<std::string, 9> smileyFaces =
 	{
 		":o", //0 left pressed
 		":3", //1 left held to flag
-		":D", //2 left released
-		";p", //3 right pressed to flag
-		":p", //4 right released after flag
+		":]", //2 left released
+		":c", //3 right pressed to flag
+		";p", //4 right released after flag
 		"X(", //5 hit a mine
 		":?", //6 clicked keyboard not mouse
 		":)", //7 default (nothing clicked/pressed)
+		":D", //8 game won
 	};
 
 	int boardLeftPadding = 0;
@@ -966,7 +967,7 @@ int main()
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
 				gameWon = true;
-				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[8].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
 				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
