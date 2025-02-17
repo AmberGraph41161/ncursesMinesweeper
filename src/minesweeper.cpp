@@ -275,11 +275,11 @@ namespace Mines
 		}
 	}
 
+#include <ncurses.h>
+
 	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
 	{
-		int realFlagCount = 0;
 		int fakeFlagCount = 0;
-		int realFilledCharCount = 0;
 		int fakeFilledCharCount = 0;
 
 		for(int y = 0; y < board.size(); y++)
@@ -288,19 +288,13 @@ namespace Mines
 			{
 				if(board[y][x].displayChar == boardCharSet.flagChar)
 				{
-					if(board[y][x].actualChar == boardCharSet.mineChar)
-					{
-						realFlagCount++;
-					} else
+					if(board[y][x].actualChar != boardCharSet.mineChar)
 					{
 						fakeFlagCount++;
 					}
 				} else if(board[y][x].displayChar == boardCharSet.filledChar)
 				{
-					if(board[y][x].actualChar == boardCharSet.mineChar)
-					{
-						realFilledCharCount++;
-					} else
+					if(board[y][x].actualChar != boardCharSet.mineChar)
 					{
 						fakeFilledCharCount++;
 					}
@@ -308,14 +302,10 @@ namespace Mines
 			}
 		}
 
-		if(realFlagCount == chosenDifficultyBoardMines || realFilledCharCount == chosenDifficultyBoardMines)
+		if(fakeFlagCount == 0 && fakeFilledCharCount == 0)
 		{
-			if(fakeFlagCount == 0 && fakeFilledCharCount == 0)
-			{
-				return true;
-			}
+			return true;
 		}
-
 		return false;
 	}
 }
