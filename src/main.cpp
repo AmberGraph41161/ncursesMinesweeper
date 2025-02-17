@@ -159,8 +159,7 @@ int main()
 	const int customBoardDifficulty = 5;
 	const int changeColorsDifficulty = 6;
 
-	int customBoardMenuCursor = 0;
-	int customBoardMenuInputBuffer = 0;
+	int customBoardMenuCursor = 1;
 
 	//DEBUG TEMP VARS
 	int colorone = 0;
@@ -215,6 +214,7 @@ int main()
 	int previousScreenHeight = 0;
 	int previousScreenWidth = 0;
 	bool gameOver = false;
+	bool gameWon = false;
 	bool startMenu = true;
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
@@ -334,6 +334,107 @@ int main()
 			}
 		} else if(customBoardMenu)
 		{
+			getmaxyx(stdscr, screenHeight, screenWidth);
+			attron(COLOR_PAIR(6));
+			mvprintw(0, 0, "[press '\\' to go back] ");
+			attroff(COLOR_PAIR(6));
+			attron(COLOR_PAIR(1));
+			printw("[screenHeight: %05d, screenWidth: %05d]", screenHeight, screenWidth);
+			attroff(COLOR_PAIR(1));
+
+			mvprintw(1, 0, "press 'h' to modify customBoardHeight");
+			mvprintw(2, 0, "press 'w' to modify customBoardWidth");
+			mvprintw(3, 0, "press 'm' to modify customBoardMines");
+
+			mvprintw(4, 0, "customBoardHeight: %03d", chosenDifficultyBoardHeight);
+				customBoardMenuCursor == 1 ? printw(" < (enter to confirm)") : printw("                     ");
+			mvprintw(5, 0, "customBoardWidth: %03d", chosenDifficultyBoardWidth);
+				customBoardMenuCursor == 2 ? printw(" < (enter to confirm)") : printw("                     ");
+			mvprintw(6, 0, "customBoardMines: %03d", chosenDifficultyBoardMines);
+				customBoardMenuCursor == 3 ? printw(" < (enter to confirm)") : printw("                     ");
+
+			input = getch();
+			if(input == 'q' || input == '`')
+			{
+				break;
+			}
+
+			if(input == '\\') 
+			{
+				chosenDifficulty = -1;
+				customBoardMenu = false;
+				startMenu = true;
+				continue;
+			}
+
+			if(input == 'h')
+			{
+				customBoardMenuCursor = 1;
+			} else if(input == 'w')
+			{
+				customBoardMenuCursor = 2;
+			} else if(input == 'm')
+			{
+				customBoardMenuCursor = 3;
+			} else if(input == '\n')
+			{
+				customBoardMenuCursor++;
+				if(customBoardMenuCursor > 3)
+				{
+					customBoardMenuCursor = 0;
+				}
+			}
+
+			if(customBoardMenuCursor != 0 && input >= '0' && input <= '9')
+			{
+				if(customBoardMenuCursor == 1)
+				{
+					if((chosenDifficultyBoardHeight * 10) + (input - '0') <= 999)
+					{
+						chosenDifficultyBoardHeight *= 10;
+						chosenDifficultyBoardHeight += input - '0';
+					}
+				} else if(customBoardMenuCursor == 2)
+				{
+					if((chosenDifficultyBoardWidth * 10) + (input - '0') <= 999)
+					{
+						chosenDifficultyBoardWidth *= 10;
+						chosenDifficultyBoardWidth += input - '0';
+					}
+				} else if(customBoardMenuCursor == 3)
+				{
+					if((chosenDifficultyBoardMines * 10) + (input - '0') <= 999)
+					{
+						chosenDifficultyBoardMines *= 10;
+						chosenDifficultyBoardMines += input - '0';
+					}
+				}
+
+			} else if(input == KEY_BACKSPACE)
+			{
+				if(customBoardMenuCursor == 1)
+				{
+					if((chosenDifficultyBoardHeight * 10) + (input - '0') > 0)
+					{
+						chosenDifficultyBoardHeight /= 10;
+					}
+				} else if(customBoardMenuCursor == 2)
+				{
+					if((chosenDifficultyBoardWidth * 10) + (input - '0') > 0)
+					{
+						chosenDifficultyBoardWidth /= 10;
+					}
+				} else if(customBoardMenuCursor == 3)
+				{
+					if((chosenDifficultyBoardMines * 10) + (input - '0') > 0)
+					{
+						chosenDifficultyBoardMines /= 10;
+					}
+				}
+			}
+
+
+			/*
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			attron(COLOR_PAIR(3));
 			mvprintw(0, 0, "(page %d/3) ", customBoardMenuCursor);
@@ -481,6 +582,7 @@ int main()
 				}
 				clear();
 			}
+			*/
 		} else if(changeColorsMenu)
 		{
 			attron(COLOR_PAIR(6));
@@ -539,7 +641,11 @@ int main()
 				changeColorsMenuSelectedColorToModify = 3;
 			} else if(input == '\n')
 			{
-				changeColorsMenuSelectedColorToModify = 0;
+				changeColorsMenuSelectedColorToModify++;
+				if(changeColorsMenuSelectedColorToModify > 3)
+				{
+					changeColorsMenuSelectedColorToModify = 0;
+				}
 			}
 
 			if(changeColorsMenuSelectedColorToModify == 0 && input >= '1' && input <= '8')
@@ -672,7 +778,7 @@ int main()
 
 		} else if(gameplayMenu)
 		{
-			if(!gameOver)
+			if(!gameOver && !gameWon)
 			{
 				gameEndTime = std::chrono::high_resolution_clock::now();
 				gameTimeElapsed = gameEndTime - gameStartTime;
@@ -859,6 +965,7 @@ int main()
 
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
+				gameWon = true;
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
@@ -870,6 +977,7 @@ int main()
 		{
 			//reset game here
 			gameOver = false;
+			gameWon = false;
 
 			startMenu = true;
 			haveNotInitializedMinesYet = true;
