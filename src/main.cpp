@@ -855,7 +855,7 @@ int main()
 				break;
 			}
 
-			if(gameOver)
+			if(gameOver || gameWon)
 			{
 				if(input == 'r')
 				{
