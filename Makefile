@@ -1,2 +1,2 @@
 all:
-	clang++ -Wall -std=c++17 -lncurses -o main src/main.cpp src/minesweeper.cpp
+	clang++ -Wall -std=c++17 -lncurses -o main src/main.cpp src/minesweeper.cpp src/saveloaddata.cpp

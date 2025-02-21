@@ -6,6 +6,7 @@
 #include <array>
 
 #include "minesweeper.hpp"
+#include "saveloaddata.hpp"
 
 //https://www.youtube.com/watch?v=YyyhQ0B3huo
 #define CUSTOM_COLOR_ONE 21
@@ -26,15 +27,6 @@ init_color(COLOR_RED, 700, 0, 0);
 
 //do RGB256/256, and get first 3 nums after decimal
 */
-
-struct Triple
-{
-	Triple(int r, int g, int b) : red(r), green(g), blue(b) {}
-
-	int red = 0;
-	int green = 0;
-	int blue = 0;
-};
 
 void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int boardTopPadding, int boardLeftPadding, Mines::BoardCharSet boardCharSet)
 {
@@ -87,15 +79,6 @@ int main()
 	start_color();
 	use_default_colors(); //allows for -1 for transparent background
 
-	const Triple defaultColorOne = { 0, 0, 996 };
-	const Triple defaultColorTwo = { 0, 507, 0 };
-	const Triple defaultColorThree = { 992, 0, 0 };
-	const Triple defaultColorFour = { 0, 0, 515 };
-	const Triple defaultColorFive = { 515, 0, 0 };
-	const Triple defaultColorSix = { 0, 507, 515 };
-	const Triple defaultColorSeven = { 515, 0, 515 };
-	const Triple defaultColorEight = { 457, 457, 457 };
-
 	std::array<Triple, 8> numberColors =
 	{
 		Triple(0, 0, 996),
@@ -107,6 +90,8 @@ int main()
 		Triple(515, 0, 515),
 		Triple(457, 457, 457),
 	};
+	makeSureDatFolderExists();
+	loadNumberColors("dat/numberColors.txt", numberColors);
 
 	init_color(CUSTOM_COLOR_ONE, 0, 0, 996);
 	init_color(CUSTOM_COLOR_TWO, 0, 507, 0);
@@ -160,11 +145,6 @@ int main()
 	const int changeColorsDifficulty = 6;
 
 	int customBoardMenuCursor = 1;
-
-	//DEBUG TEMP VARS
-	int colorone = 0;
-	int colortwo = 0;
-	int colorthree = 0;
 
 	int changeColorsMenuSelectedColorToModify = 0;
 	int changeColorsMenuSelectedNumber = '1';
@@ -433,157 +413,6 @@ int main()
 					}
 				}
 			}
-
-
-			/*
-			getmaxyx(stdscr, screenHeight, screenWidth);
-			attron(COLOR_PAIR(3));
-			mvprintw(0, 0, "(page %d/3) ", customBoardMenuCursor);
-			attroff(COLOR_PAIR(3));
-			attron(COLOR_PAIR(2));
-			printw("[hit '\\' to go back] ");
-			attroff(COLOR_PAIR(2));
-			attron(COLOR_PAIR(6));
-			printw("[use arrow keys to move to next page] ");
-			attroff(COLOR_PAIR(6));
-			attron(COLOR_PAIR(1));
-			printw("[screenHeight: %d, screenWidth: %d]", screenHeight, screenWidth);
-			attroff(COLOR_PAIR(1));
-			printw("          ");
-
-			switch(customBoardMenuCursor)
-			{
-				case 0:
-					chosenDifficultyBoardHeight = customBoardMenuInputBuffer;
-					mvprintw(1, 0, "Enter customBoardHeight: %d <   ", chosenDifficultyBoardHeight);
-					break;
-
-				case 1:
-					chosenDifficultyBoardWidth = customBoardMenuInputBuffer;
-					mvprintw(1, 0, "Enter customBoardWidth: %d <   ", chosenDifficultyBoardWidth);
-					break;
-				
-				case 2:
-					chosenDifficultyBoardMines = customBoardMenuInputBuffer;
-					mvprintw(1, 0, "Enter customBoardMines: %d <   ", chosenDifficultyBoardMines);
-					break;
-
-				case 3:
-					mvprintw(1, 0, "customBoardHeight: %d <        ", chosenDifficultyBoardHeight);
-					mvprintw(2, 0, "customBoardWidth: %d <         ", chosenDifficultyBoardWidth);
-					mvprintw(3, 0, "customBoardMines: %d <         ", chosenDifficultyBoardMines);
-					if(((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
-					{
-						attron(COLOR_PAIR(2));
-						mvprintw(4, 0, "Continue? (y, n)");
-						attroff(COLOR_PAIR(2));
-					} else
-					{
-						attron(COLOR_PAIR(6));
-						mvprintw(5, 0, "The following:");
-						attroff(COLOR_PAIR(6));
-						mvprintw(6, 0, "    ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) = %d",
-							((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9));
-						attron(COLOR_PAIR(6));
-
-						mvprintw(8, 0, "Must be equal to or exceed: ");
-						attroff(COLOR_PAIR(6));
-						mvprintw(9, 0, "    chosenDifficultyBoardMines = %d", chosenDifficultyBoardMines);
-
-						attron(COLOR_PAIR(6));
-						mvprintw(11, 0, "Please re-enter values...");
-						attroff(COLOR_PAIR(6));
-					}
-					break;
-
-				default:
-					customBoardMenuCursor > 3 ? customBoardMenuCursor = 0 : customBoardMenuCursor = 3;
-					continue;
-			}
-
-			input = getch();
-			if(input == 'q' || input == '`')
-			{
-				break;
-			}
-
-			if(input == '\\') 
-			{
-				chosenDifficulty = -1;
-				customBoardMenu = false;
-				startMenu = true;
-				continue;
-			}
-
-			if(input >= '0' && input <= '9')
-			{
-				if((customBoardMenuInputBuffer * 10) + (input - '0') <= 999)
-				{
-					customBoardMenuInputBuffer *= 10;
-					customBoardMenuInputBuffer += input - '0';
-				}
-			} else if(input == '\\' && customBoardMenuInputBuffer > 0)
-			{
-				customBoardMenuInputBuffer /= 10;
-			} else if(input == KEY_DOWN || input == KEY_RIGHT)
-			{
-				customBoardMenuCursor++;
-				if(customBoardMenuCursor == 0)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
-				} else if(customBoardMenuCursor == 1)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
-				} else if(customBoardMenuCursor == 2)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
-				} else
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
-				}
-				clear();
-			} else if(input == KEY_UP || input == KEY_LEFT)
-			{
-				customBoardMenuCursor--;
-				if(customBoardMenuCursor == 0)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
-				} else if(customBoardMenuCursor == 1)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
-				} else if(customBoardMenuCursor == 2)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
-				}
-				clear();
-			} else if(input == 'y')
-			{
-				if(customBoardMenuCursor == 3
-				&& ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
-				{
-					clear();
-					customBoardMenu = false;
-					gameplayMenu = true;
-					Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
-					gameStartTime = std::chrono::high_resolution_clock::now();
-					nodelay(stdscr, TRUE);
-				}
-			} else if(customBoardMenuCursor == 3)
-			{
-				customBoardMenuCursor++;
-				if(customBoardMenuCursor == 0)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardHeight;
-				} else if(customBoardMenuCursor == 1)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardWidth;
-				} else if(customBoardMenuCursor == 2)
-				{
-					customBoardMenuInputBuffer = chosenDifficultyBoardMines;
-				}
-				clear();
-			}
-			*/
 		} else if(changeColorsMenu)
 		{
 			attron(COLOR_PAIR(6));
@@ -604,12 +433,6 @@ int main()
 			mvprintw(9, 0, "press 'b' to modify selected number B: %03d value (between 0-999)",
 				numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue);
 				changeColorsMenuSelectedColorToModify == 3 ? printw(" < (enter to confirm)") : printw("                     ");
-			/*
-			mvprintw(11, 0, "R: %03d, G: %03d, B: %03d",
-				numberColors[changeColorsMenuSelectedNumber - '0' - 1].red,
-				numberColors[changeColorsMenuSelectedNumber - '0' - 1].green,
-				numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue);
-			*/
 			drawBoard(stdscr, changeColorsMenuSampleBoard, 11, 0, boardCharSet);
 
 			input = getch();
@@ -624,6 +447,10 @@ int main()
 
 			if(input == '\\')
 			{
+				makeSureDatFolderExists();
+				saveNumberColors("dat/numberColors.txt", numberColors);
+				saveNumberColors("dat/testing.txt", numberColors);
+
 				chosenDifficulty = -1;
 				changeColorsMenu = false;
 				startMenu = true;
