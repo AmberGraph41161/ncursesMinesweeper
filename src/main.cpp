@@ -78,21 +78,7 @@ int main()
 	}
 	start_color();
 	use_default_colors(); //allows for -1 for transparent background
-
-	std::array<Triple, 8> numberColors =
-	{
-		Triple(0, 0, 996),
-		Triple(0, 507, 0),
-		Triple(992, 0, 0),
-		Triple(0, 0, 515),
-		Triple(515, 0, 0),
-		Triple(0, 507, 515),
-		Triple(515, 0, 515),
-		Triple(457, 457, 457),
-	};
-	makeSureDatFolderExists();
-	loadNumberColors("dat/numberColors.txt", numberColors);
-
+	
 	init_color(CUSTOM_COLOR_ONE, 0, 0, 996);
 	init_color(CUSTOM_COLOR_TWO, 0, 507, 0);
 	init_color(CUSTOM_COLOR_THREE, 992, 0, 0);
@@ -121,6 +107,40 @@ int main()
 	init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
 	init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
 	init_pair(9, CUSTOM_COLOR_NINE, backgroundColor);
+
+	const std::string numberColorsSaveFilePath = "dat/numberColors.txt";
+	std::array<Triple, 8> numberColors =
+	{
+		Triple(0, 0, 996),
+		Triple(0, 507, 0),
+		Triple(992, 0, 0),
+		Triple(0, 0, 515),
+		Triple(515, 0, 0),
+		Triple(0, 507, 515),
+		Triple(515, 0, 515),
+		Triple(457, 457, 457),
+	};
+
+	makeSureDatFolderExists();
+	if(loadNumberColors(numberColorsSaveFilePath, numberColors))
+	{
+		init_color(CUSTOM_COLOR_ONE, numberColors[0].red, numberColors[0].green, numberColors[0].blue);
+		init_color(CUSTOM_COLOR_TWO, numberColors[1].red, numberColors[1].green, numberColors[1].blue);
+		init_color(CUSTOM_COLOR_THREE, numberColors[2].red, numberColors[2].green, numberColors[2].blue);
+		init_color(CUSTOM_COLOR_FOUR, numberColors[3].red, numberColors[3].green, numberColors[3].blue);
+		init_color(CUSTOM_COLOR_FIVE, numberColors[4].red, numberColors[4].green, numberColors[4].blue);
+		init_color(CUSTOM_COLOR_SIX, numberColors[5].red, numberColors[5].green, numberColors[5].blue);
+		init_color(CUSTOM_COLOR_SEVEN, numberColors[6].red, numberColors[6].green, numberColors[6].blue);
+		init_color(CUSTOM_COLOR_EIGHT, numberColors[7].red, numberColors[7].green, numberColors[7].blue);
+		init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+		init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+		init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+		init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+		init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+		init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+		init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+		init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+	}
 
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
@@ -415,6 +435,23 @@ int main()
 			}
 		} else if(changeColorsMenu)
 		{
+			init_color(CUSTOM_COLOR_ONE, numberColors[0].red, numberColors[0].green, numberColors[0].blue);
+			init_color(CUSTOM_COLOR_TWO, numberColors[1].red, numberColors[1].green, numberColors[1].blue);
+			init_color(CUSTOM_COLOR_THREE, numberColors[2].red, numberColors[2].green, numberColors[2].blue);
+			init_color(CUSTOM_COLOR_FOUR, numberColors[3].red, numberColors[3].green, numberColors[3].blue);
+			init_color(CUSTOM_COLOR_FIVE, numberColors[4].red, numberColors[4].green, numberColors[4].blue);
+			init_color(CUSTOM_COLOR_SIX, numberColors[5].red, numberColors[5].green, numberColors[5].blue);
+			init_color(CUSTOM_COLOR_SEVEN, numberColors[6].red, numberColors[6].green, numberColors[6].blue);
+			init_color(CUSTOM_COLOR_EIGHT, numberColors[7].red, numberColors[7].green, numberColors[7].blue);
+			init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
+			init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
+			init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
+			init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
+			init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
+			init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
+			init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
+			init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
+
 			attron(COLOR_PAIR(6));
 			mvprintw(0, 0, "changeColorsMenu [hit '\\' to go back]");
 			attroff(COLOR_PAIR(6));
@@ -448,8 +485,7 @@ int main()
 			if(input == '\\')
 			{
 				makeSureDatFolderExists();
-				saveNumberColors("dat/numberColors.txt", numberColors);
-				saveNumberColors("dat/testing.txt", numberColors);
+				saveNumberColors(numberColorsSaveFilePath, numberColors);
 
 				chosenDifficulty = -1;
 				changeColorsMenu = false;
@@ -528,23 +564,6 @@ int main()
 					}
 				}
 			}
-
-			init_color(CUSTOM_COLOR_ONE, numberColors[0].red, numberColors[0].green, numberColors[0].blue);
-			init_color(CUSTOM_COLOR_TWO, numberColors[1].red, numberColors[1].green, numberColors[1].blue);
-			init_color(CUSTOM_COLOR_THREE, numberColors[2].red, numberColors[2].green, numberColors[2].blue);
-			init_color(CUSTOM_COLOR_FOUR, numberColors[3].red, numberColors[3].green, numberColors[3].blue);
-			init_color(CUSTOM_COLOR_FIVE, numberColors[4].red, numberColors[4].green, numberColors[4].blue);
-			init_color(CUSTOM_COLOR_SIX, numberColors[5].red, numberColors[5].green, numberColors[5].blue);
-			init_color(CUSTOM_COLOR_SEVEN, numberColors[6].red, numberColors[6].green, numberColors[6].blue);
-			init_color(CUSTOM_COLOR_EIGHT, numberColors[7].red, numberColors[7].green, numberColors[7].blue);
-			init_pair(1, CUSTOM_COLOR_ONE, backgroundColor);
-			init_pair(2, CUSTOM_COLOR_TWO, backgroundColor);
-			init_pair(3, CUSTOM_COLOR_THREE, backgroundColor);
-			init_pair(4, CUSTOM_COLOR_FOUR, backgroundColor);
-			init_pair(5, CUSTOM_COLOR_FIVE, backgroundColor);
-			init_pair(6, CUSTOM_COLOR_SIX, backgroundColor);
-			init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
-			init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
 
 			if(input == 'z')
 			{
