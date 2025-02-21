@@ -78,7 +78,7 @@ int main()
 	}
 	start_color();
 	use_default_colors(); //allows for -1 for transparent background
-	
+
 	init_color(CUSTOM_COLOR_ONE, 0, 0, 996);
 	init_color(CUSTOM_COLOR_TWO, 0, 507, 0);
 	init_color(CUSTOM_COLOR_THREE, 992, 0, 0);
@@ -458,19 +458,21 @@ int main()
 			mvprintw(1, 0, "press '!' to reveal all mines");
 			mvprintw(2, 0, "press '@' to reveal entire board");
 			mvprintw(3, 0, "press '#' to heal board");
-			mvprintw(4, 0, "press '0'-'8' to select number color to modify");
+			mvprintw(4, 0, "press 'D' to reset colors to default");
+			mvprintw(5, 0, "press 'S' to save changes to file %s", numberColorsSaveFilePath.c_str());
+			mvprintw(6, 0, "press '0'-'8' to select number color to modify");
 
-			mvprintw(6, 0, "selected number color to modify: %c", changeColorsMenuSelectedNumber);
-			mvprintw(7, 0, "press 'r' to modify selected number R: %03d value (between 0-999)",
+			mvprintw(8, 0, "selected number color to modify: %c", changeColorsMenuSelectedNumber);
+			mvprintw(9, 0, "press 'r' to modify selected number R: %03d value (between 0-999)",
 				numberColors[changeColorsMenuSelectedNumber - '0' - 1].red);
 				changeColorsMenuSelectedColorToModify == 1 ? printw(" < (enter to confirm)") : printw("                     ");
-			mvprintw(8, 0, "press 'g' to modify selected number G: %03d value (between 0-999)",
+			mvprintw(10, 0, "press 'g' to modify selected number G: %03d value (between 0-999)",
 				numberColors[changeColorsMenuSelectedNumber - '0' - 1].green);
 				changeColorsMenuSelectedColorToModify == 2 ? printw(" < (enter to confirm)") : printw("                     ");
-			mvprintw(9, 0, "press 'b' to modify selected number B: %03d value (between 0-999)",
+			mvprintw(11, 0, "press 'b' to modify selected number B: %03d value (between 0-999)",
 				numberColors[changeColorsMenuSelectedNumber - '0' - 1].blue);
 				changeColorsMenuSelectedColorToModify == 3 ? printw(" < (enter to confirm)") : printw("                     ");
-			drawBoard(stdscr, changeColorsMenuSampleBoard, 11, 0, boardCharSet);
+			drawBoard(stdscr, changeColorsMenuSampleBoard, 15, 0, boardCharSet);
 
 			input = getch();
 			if(input == ERR)
@@ -484,13 +486,27 @@ int main()
 
 			if(input == '\\')
 			{
-				makeSureDatFolderExists();
-				saveNumberColors(numberColorsSaveFilePath, numberColors);
-
 				chosenDifficulty = -1;
 				changeColorsMenu = false;
 				startMenu = true;
 				board.clear();
+				continue;
+			}
+
+			if(input == 'D')
+			{
+				loadDefaultNumberColors(numberColors);
+				continue;
+			}
+
+
+			if(input == 'S')
+			{
+				makeSureDatFolderExists();
+				if(saveNumberColors(numberColorsSaveFilePath, numberColors))
+				{
+					mvprintw(13, 0, "saved changes to file \"%s\"!", numberColorsSaveFilePath.c_str());
+				}
 				continue;
 			}
 

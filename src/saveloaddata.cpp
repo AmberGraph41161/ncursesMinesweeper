@@ -105,5 +105,20 @@ bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 	return didNotHaveToLoadDefaultNumberColors;
 }
 
+void loadDefaultNumberColors(std::array<Triple, 8> &numberColors)
+{
+	numberColors =
+	{
+		Triple(0, 0, 996),
+		Triple(0, 507, 0),
+		Triple(992, 0, 0),
+		Triple(0, 0, 515),
+		Triple(515, 0, 0),
+		Triple(0, 507, 515),
+		Triple(515, 0, 515),
+		Triple(457, 457, 457),
+	};
+}
+
 bool saveScore();
 bool getHighScores();

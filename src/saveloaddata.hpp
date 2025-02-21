@@ -17,6 +17,7 @@ void makeSureDatFolderExists();
 
 bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors);
 bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors);
+void loadDefaultNumberColors(std::array<Triple, 8> &numberColors);
 
 bool saveScore();
 bool getHighScores();
