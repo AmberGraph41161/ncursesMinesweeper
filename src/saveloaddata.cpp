@@ -1,5 +1,6 @@
 #include "saveloaddata.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -14,7 +15,7 @@ void makeSureDatFolderExists()
 	}
 }
 
-static const char saveloadNumberColorsTokenDelim = ',';
+static const char SAVELOADDATATOKENDELIM = ',';
 
 bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 {
@@ -28,7 +29,7 @@ bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 
 	for(int x = 0; x < numberColors.size(); x++)
 	{
-		write << numberColors[x].red << ',' << numberColors[x].green << ',' << numberColors[x].blue;
+		write << numberColors[x].red << SAVELOADDATATOKENDELIM << numberColors[x].green << SAVELOADDATATOKENDELIM << numberColors[x].blue;
 		if(x < numberColors.size() - 1)
 		{
 			write << '\n';
@@ -68,7 +69,7 @@ bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 	{
 		std::stringstream lineEater(getlinestring);
 		std::vector<std::string> tokens;
-		while(std::getline(lineEater, getlinestring, ','))
+		while(std::getline(lineEater, getlinestring, SAVELOADDATATOKENDELIM))
 		{
 			tokens.push_back(getlinestring);
 			if(tokens.size() >= 3)
@@ -120,5 +121,80 @@ void loadDefaultNumberColors(std::array<Triple, 8> &numberColors)
 	};
 }
 
-bool saveScore();
-bool getHighScores();
+bool playerNameIsOkay(std::string playerName)
+{
+	return (playerName.find(SAVELOADDATATOKENDELIM) != std::string::npos);
+}
+
+bool savePlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores)
+{
+	std::fstream write;
+	write.open(filePath, std::fstream::out | std::fstream::trunc);
+	if(write.fail())
+	{
+		write.close();
+		return false;
+	}
+
+	for(int x = 0; x < playerScores.size(); x++)
+	{
+		write << playerScores[x].first << SAVELOADDATATOKENDELIM << playerScores[x].second;
+		if(x < playerScores.size() - 1)
+		{
+			write << '\n';
+		}
+	}
+
+	write.close();
+	return true;
+}
+
+bool loadPlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores)
+{
+	std::fstream read;
+	read.open(filePath, std::fstream::in);
+	if(read.fail())
+	{
+		read.close();
+		return false;
+	}
+
+	std::string getlinestring;
+	while(std::getline(read, getlinestring))
+	{
+		std::stringstream lineEater(getlinestring);
+		std::vector<std::string> tokens;
+		while(std::getline(lineEater, getlinestring, SAVELOADDATATOKENDELIM))
+		{
+			tokens.push_back(getlinestring);
+			if(tokens.size() >= 2)
+			{
+				break;
+			}
+		}
+		while(tokens.size() < 2)
+		{
+			tokens.push_back("?");
+		}
+
+		try
+		{
+			playerScores.push_back(std::make_pair(tokens[0], std::stoi(tokens[1])));
+		} catch(...)
+		{
+			continue;
+		}
+	}
+	read.close();
+
+	return true;
+}
+
+void sortPlayerScores(std::vector<std::pair<std::string, double>> &playerScores)
+{
+	std::sort(playerScores.begin(), playerScores.end(),
+	[](const std::pair<std::string, double> &left, const std::pair<std::string, double> &right)
+	{
+		return left.second < right.second;
+	});
+}

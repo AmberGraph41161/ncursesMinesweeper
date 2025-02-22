@@ -3,6 +3,7 @@
 
 #include <string>
 #include <array>
+#include <vector>
 
 struct Triple
 {
@@ -19,7 +20,9 @@ bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors);
 void loadDefaultNumberColors(std::array<Triple, 8> &numberColors);
 
-bool saveScore();
-bool getHighScores();
+bool playerNameIsOkay(std::string playerName);
+bool savePlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores);
+bool loadPlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores);
+void sortPlayerScores(std::vector<std::pair<std::string, double>> &playerScores);
 
 #endif

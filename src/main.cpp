@@ -1,9 +1,9 @@
 #include <iostream>
 #include <chrono>
-#include <cstdlib>
-#include <ncurses.h>
 #include <vector>
 #include <array>
+
+#include <ncurses.h>
 
 #include "minesweeper.hpp"
 #include "saveloaddata.hpp"
@@ -120,7 +120,6 @@ int main()
 		Triple(515, 0, 515),
 		Triple(457, 457, 457),
 	};
-
 	makeSureDatFolderExists();
 	if(loadNumberColors(numberColorsSaveFilePath, numberColors))
 	{
@@ -141,6 +140,24 @@ int main()
 		init_pair(7, CUSTOM_COLOR_SEVEN, backgroundColor);
 		init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
 	}
+
+	const std::string playerScoresSaveFilePath = "dat/playerScores.txt";
+	std::vector<std::pair<std::string, double>> playerScores;
+	loadPlayerSCores(playerScoresSaveFilePath, playerScores);
+	clear();
+	for(int x = 0; x < playerScores.size(); x++)
+	{
+		mvprintw(x, 0, "name: %s, score: %f", playerScores[x].first.c_str(), playerScores[x].second);
+	}
+	getch();
+	sortPlayerScores(playerScores);
+	clear();
+	for(int x = 0; x < playerScores.size(); x++)
+	{
+		mvprintw(x, 0, "name: %s, score: %f", playerScores[x].first.c_str(), playerScores[x].second);
+	}
+	getch();
+
 
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
@@ -347,12 +364,22 @@ int main()
 			mvprintw(2, 0, "press 'w' to modify customBoardWidth");
 			mvprintw(3, 0, "press 'm' to modify customBoardMines");
 
-			mvprintw(4, 0, "customBoardHeight: %03d", chosenDifficultyBoardHeight);
+			mvprintw(5, 0, "customBoardHeight: %03d", chosenDifficultyBoardHeight);
 				customBoardMenuCursor == 1 ? printw(" < (enter to confirm)") : printw("                     ");
-			mvprintw(5, 0, "customBoardWidth: %03d", chosenDifficultyBoardWidth);
+			mvprintw(6, 0, "customBoardWidth: %03d", chosenDifficultyBoardWidth);
 				customBoardMenuCursor == 2 ? printw(" < (enter to confirm)") : printw("                     ");
-			mvprintw(6, 0, "customBoardMines: %03d", chosenDifficultyBoardMines);
+			mvprintw(7, 0, "customBoardMines: %03d", chosenDifficultyBoardMines);
 				customBoardMenuCursor == 3 ? printw(" < (enter to confirm)") : printw("                     ");
+
+			if(((chosenDifficultyBoardWidth * chosenDifficultyBoardHeight) - 9) >= chosenDifficultyBoardMines)
+			{
+				mvprintw(9, 0, "looks good! press 'r' to start!");
+				mvprintw(10, 0, "                                                                              ");
+			} else
+			{
+				mvprintw(9, 0, "your math doesn't check out....");
+				mvprintw(10, 0, "make sure that (customBoardHeight * customBoardWidth) - 9 >=  customBoardMines");
+			}
 
 			input = getch();
 			if(input == 'q' || input == '`')
@@ -365,6 +392,18 @@ int main()
 				chosenDifficulty = -1;
 				customBoardMenu = false;
 				startMenu = true;
+				continue;
+			}
+
+			if(input == 'r'
+			&& ((chosenDifficultyBoardHeight * chosenDifficultyBoardWidth) - 9) >= chosenDifficultyBoardMines)
+			{
+				clear();
+				customBoardMenu = false;
+				gameplayMenu = true;
+				Mines::initializeBoard(board, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth, boardCharSet);
+				gameStartTime = std::chrono::high_resolution_clock::now();
+				nodelay(stdscr, TRUE);
 				continue;
 			}
 
