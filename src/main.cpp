@@ -143,21 +143,11 @@ int main()
 
 	const std::string playerScoresSaveFilePath = "dat/playerScores.txt";
 	std::vector<std::pair<std::string, double>> playerScores;
-	loadPlayerSCores(playerScoresSaveFilePath, playerScores);
-	clear();
-	for(int x = 0; x < playerScores.size(); x++)
-	{
-		mvprintw(x, 0, "name: %s, score: %f", playerScores[x].first.c_str(), playerScores[x].second);
-	}
-	getch();
-	sortPlayerScores(playerScores);
-	clear();
-	for(int x = 0; x < playerScores.size(); x++)
-	{
-		mvprintw(x, 0, "name: %s, score: %f", playerScores[x].first.c_str(), playerScores[x].second);
-	}
-	getch();
+	loadPlayerScores(playerScoresSaveFilePath, playerScores);
 
+	const std::string playerNameSaveFilePath = "dat/playerName.txt";
+	std::string playerName = "player0";
+	loadPlayerName(playerNameSaveFilePath, playerName);
 
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
@@ -233,6 +223,7 @@ int main()
 	int previousScreenWidth = 0;
 	bool gameOver = false;
 	bool gameWon = false;
+	bool savedPlayerScore = false;
 	bool startMenu = true;
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
@@ -684,6 +675,15 @@ int main()
 			{
 				gameEndTime = std::chrono::high_resolution_clock::now();
 				gameTimeElapsed = gameEndTime - gameStartTime;
+			} else if(gameWon && !savedPlayerScore)
+			{
+				playerScores.push_back(std::make_pair(playerName, gameTimeElapsed.count()));
+				sortPlayerScores(playerScores);
+
+				makeSureDatFolderExists();
+				savePlayerScores(playerScoresSaveFilePath, playerScores);
+
+				savedPlayerScore = true;
 			}
 
 			//center information padding
@@ -880,6 +880,7 @@ int main()
 			//reset game here
 			gameOver = false;
 			gameWon = false;
+			savedPlayerScore = false;
 
 			startMenu = true;
 			haveNotInitializedMinesYet = true;

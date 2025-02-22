@@ -16,13 +16,16 @@ struct Triple
 
 void makeSureDatFolderExists();
 
-bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors);
-bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors);
+bool saveNumberColors(const std::string &filePath, std::array<Triple, 8> &numberColors);
+bool loadNumberColors(const std::string &filePath, std::array<Triple, 8> &numberColors);
 void loadDefaultNumberColors(std::array<Triple, 8> &numberColors);
 
-bool playerNameIsOkay(std::string playerName);
-bool savePlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores);
-bool loadPlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores);
+bool playerNameIsOkay(const std::string &playerName);
+bool savePlayerName(const std::string &filePath, const std::string &playerName);
+bool loadPlayerName(const std::string &filePath, std::string &playerName);
+
+bool savePlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores);
+bool loadPlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores);
 void sortPlayerScores(std::vector<std::pair<std::string, double>> &playerScores);
 
 #endif

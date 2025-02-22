@@ -17,7 +17,7 @@ void makeSureDatFolderExists()
 
 static const char SAVELOADDATATOKENDELIM = ',';
 
-bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
+bool saveNumberColors(const std::string &filePath, std::array<Triple, 8> &numberColors)
 {
 	std::fstream write;
 	write.open(filePath, std::fstream::out | std::fstream::trunc);
@@ -40,7 +40,7 @@ bool saveNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
 	return true;
 }
 
-bool loadNumberColors(std::string filePath, std::array<Triple, 8> &numberColors)
+bool loadNumberColors(const std::string &filePath, std::array<Triple, 8> &numberColors)
 {
 	std::fstream read;
 	read.open(filePath, std::fstream::in);
@@ -121,12 +121,57 @@ void loadDefaultNumberColors(std::array<Triple, 8> &numberColors)
 	};
 }
 
-bool playerNameIsOkay(std::string playerName)
+bool playerNameIsOkay(const std::string &playerName)
 {
 	return (playerName.find(SAVELOADDATATOKENDELIM) != std::string::npos);
 }
 
-bool savePlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores)
+bool savePlayerName(const std::string &filePath, const std::string &playerName)
+{
+	std::fstream write;
+	write.open(filePath, std::fstream::out | std::fstream::trunc);
+	if(write.fail())
+	{
+		write.close();
+		return false;
+	}
+
+	write << playerName;
+	write.close();
+
+	return true;
+}
+
+bool loadPlayerName(const std::string &filePath, std::string &playerName)
+{
+	std::fstream read;
+	read.open(filePath, std::fstream::in);
+
+	if(read.fail())
+	{
+		read.close();
+		return false;
+	}
+
+	std::string getlinestring;
+	std::getline(read, getlinestring);
+	if(!playerNameIsOkay(getlinestring))
+	{
+		for(int x = 0; x < getlinestring.size(); x++)
+		{
+			if(getlinestring[x] == SAVELOADDATATOKENDELIM)
+			{
+				getlinestring.erase(getlinestring.begin() + x);
+				x--;
+			}
+		}
+	}
+
+	playerName = getlinestring;
+	return true;
+}
+
+bool savePlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores)
 {
 	std::fstream write;
 	write.open(filePath, std::fstream::out | std::fstream::trunc);
@@ -149,7 +194,7 @@ bool savePlayerScores(std::string filePath, std::vector<std::pair<std::string, d
 	return true;
 }
 
-bool loadPlayerScores(std::string filePath, std::vector<std::pair<std::string, double>> &playerScores)
+bool loadPlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores)
 {
 	std::fstream read;
 	read.open(filePath, std::fstream::in);
