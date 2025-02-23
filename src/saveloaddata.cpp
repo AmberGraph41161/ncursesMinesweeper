@@ -171,7 +171,7 @@ bool loadPlayerName(const std::string &filePath, std::string &playerName)
 	return true;
 }
 
-bool savePlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores)
+bool savePlayerScores(const std::string &filePath, std::vector<PlayerScore> &playerScores)
 {
 	std::fstream write;
 	write.open(filePath, std::fstream::out | std::fstream::trunc);
@@ -183,7 +183,10 @@ bool savePlayerScores(const std::string &filePath, std::vector<std::pair<std::st
 
 	for(int x = 0; x < playerScores.size(); x++)
 	{
-		write << playerScores[x].first << SAVELOADDATATOKENDELIM << playerScores[x].second;
+		write << playerScores[x].playerName << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].difficulty << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].score;
+
 		if(x < playerScores.size() - 1)
 		{
 			write << '\n';
@@ -194,7 +197,7 @@ bool savePlayerScores(const std::string &filePath, std::vector<std::pair<std::st
 	return true;
 }
 
-bool loadPlayerScores(const std::string &filePath, std::vector<std::pair<std::string, double>> &playerScores)
+bool loadPlayerScores(const std::string &filePath, std::vector<PlayerScore> &playerScores)
 {
 	std::fstream read;
 	read.open(filePath, std::fstream::in);
@@ -212,19 +215,19 @@ bool loadPlayerScores(const std::string &filePath, std::vector<std::pair<std::st
 		while(std::getline(lineEater, getlinestring, SAVELOADDATATOKENDELIM))
 		{
 			tokens.push_back(getlinestring);
-			if(tokens.size() >= 2)
+			if(tokens.size() >= 3)
 			{
 				break;
 			}
 		}
-		while(tokens.size() < 2)
+		while(tokens.size() < 3)
 		{
 			tokens.push_back("?");
 		}
 
 		try
 		{
-			playerScores.push_back(std::make_pair(tokens[0], std::stoi(tokens[1])));
+			playerScores.push_back(PlayerScore(tokens[0], std::stoi(tokens[1]), std::stod(tokens[2])));
 		} catch(...)
 		{
 			continue;
@@ -235,11 +238,11 @@ bool loadPlayerScores(const std::string &filePath, std::vector<std::pair<std::st
 	return true;
 }
 
-void sortPlayerScores(std::vector<std::pair<std::string, double>> &playerScores)
+void sortPlayerScores(std::vector<PlayerScore> &playerScores)
 {
 	std::sort(playerScores.begin(), playerScores.end(),
-	[](const std::pair<std::string, double> &left, const std::pair<std::string, double> &right)
+	[](const PlayerScore &left, const PlayerScore &right)
 	{
-		return left.second < right.second;
+		return left.score < right.score;
 	});
 }

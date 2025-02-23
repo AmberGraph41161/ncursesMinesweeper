@@ -173,8 +173,13 @@ int main()
 	}
 
 	const std::string playerScoresSaveFilePath = "dat/playerScores.txt";
-	std::vector<std::pair<std::string, double>> playerScores;
+	std::vector<PlayerScore> playerScores;
 	loadPlayerScores(playerScoresSaveFilePath, playerScores);
+	clear();
+	for(int x = 0; x < playerScores.size(); x++)
+	{
+		mvprintw(x, 0, "N: %s, D: %d, S: %f", playerScores[x].playerName.c_str(), playerScores[x].difficulty, playerScores[x].score);
+	}
 
 	const std::string playerNameSaveFilePath = "dat/playerName.txt";
 	std::string playerName = "player0";
@@ -724,7 +729,7 @@ int main()
 				gameTimeElapsed = gameEndTime - gameStartTime;
 			} else if(gameWon && !savedPlayerScore)
 			{
-				playerScores.push_back(std::make_pair(playerName, gameTimeElapsed.count()));
+				playerScores.push_back(PlayerScore(playerName, chosenDifficulty, gameTimeElapsed.count()));
 				sortPlayerScores(playerScores);
 
 				makeSureDatFolderExists();
@@ -1108,7 +1113,9 @@ int main()
 			raw(); //calling this too just in case...? might be unnecessary
 		}
 	}
-	//getch();
+
+	//save data?
+	savePlayerScores(playerScoresSaveFilePath, playerScores);
 
 	endwin();
 	return 0;
