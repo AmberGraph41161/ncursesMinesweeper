@@ -52,6 +52,37 @@ void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board
 	}
 }
 
+void drawBoardNumbers(WINDOW* window, int boardTopPadding, int boardLeftPadding, int chosenDifficultyBoardHeight, int chosenDifficultyBoardWidth, bool fillWithZeros = false)
+{
+	const int drawBoardNumberHeightPadding = 1;
+	const int drawBoardNumbersWidthPadding = 1;
+
+	//yeah, this is kinda gross lol
+	int heightFill = std::to_string(chosenDifficultyBoardHeight).size();
+
+	std::string heightFormatString;
+	std::string widthFormatString;
+	if(fillWithZeros)
+	{
+		heightFormatString = "%0" + std::to_string(heightFill) + "d";
+		widthFormatString = "%0d";
+	} else
+	{
+		heightFormatString = "%" + std::to_string(heightFill) + "d";
+		widthFormatString = "%d";
+	}
+
+	for(int y = 0; y < chosenDifficultyBoardHeight; y++)
+	{
+		mvwprintw(window, boardTopPadding + y, boardLeftPadding - heightFill - drawBoardNumbersWidthPadding, heightFormatString.c_str(), y);
+	}
+
+	for(int x = 0; x < chosenDifficultyBoardWidth; x++)
+	{
+		mvwprintw(window, boardTopPadding + chosenDifficultyBoardHeight + drawBoardNumberHeightPadding, boardLeftPadding + x, widthFormatString.c_str(), x % 10);
+	}
+}
+
 int main()
 {
 	srand(std::chrono::system_clock::now().time_since_epoch().count());
@@ -149,6 +180,8 @@ int main()
 	std::string playerName = "player0";
 	loadPlayerName(playerNameSaveFilePath, playerName);
 
+	bool allowKeyboardCursorBlink = false;
+	bool allowKeyboardCursorWrapAroundBoard = true;
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
 
@@ -208,6 +241,20 @@ int main()
 	int gameOverInformationLeftPadding = 0;
 	int gameWonInformationTopPadding = 0;
 	int gameWonInformationLeftPadding = 0;
+	int keyboardCursorTopPadding = 0;
+	int keyboardCursorLeftPadding = 0;
+
+	int keyboardCursorJumpValueMultiplierThisFrame = 0;
+	int keyboardCursorY = 0;
+	int keyboardCursorX = 0;
+	const char keyboardCursorChar = '+';
+	bool showKeyboardCursor = true;
+	
+	const double keyboardCursorBlinkFirstThreshold = 0.25;
+	const double keyboardCursorBlinkSecondThreshold = keyboardCursorBlinkFirstThreshold * 2;
+	std::chrono::time_point<std::chrono::system_clock> keyboardCursorBlinkStart = std::chrono::high_resolution_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> keyboardCursorBlinkEnd;
+	std::chrono::duration<double> keyboardCursorBlinkTimeElapsed;
 
 	Mines::BoardCharSet boardCharSet;
 	std::vector<std::vector<Mines::BoardCell>> board;
@@ -708,13 +755,34 @@ int main()
 			gameOverInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 			gameWonInformationTopPadding = boardTopPadding + 2;
 			gameWonInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
+			keyboardCursorTopPadding = boardTopPadding + keyboardCursorY;
+			keyboardCursorLeftPadding = boardLeftPadding + keyboardCursorX;
 
 			if(!initialSmileyFacesHasBeenPrinted)
 			{
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[7].c_str());
 				initialSmileyFacesHasBeenPrinted = true;
 			}
+
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+			drawBoardNumbers(stdscr, boardTopPadding, boardLeftPadding, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth);
+
+			if(allowKeyboardCursorBlink)
+			{
+				if(keyboardCursorBlinkTimeElapsed.count() >= keyboardCursorBlinkSecondThreshold)
+				{
+					keyboardCursorBlinkStart = std::chrono::high_resolution_clock::now();
+				} else if(keyboardCursorBlinkTimeElapsed.count() <= keyboardCursorBlinkFirstThreshold)
+				{
+					mvprintw(keyboardCursorTopPadding, keyboardCursorLeftPadding, "%c", keyboardCursorChar);
+				}
+				keyboardCursorBlinkEnd = std::chrono::high_resolution_clock::now();
+				keyboardCursorBlinkTimeElapsed = keyboardCursorBlinkEnd - keyboardCursorBlinkStart;
+			} else if(showKeyboardCursor)
+			{
+				mvprintw(keyboardCursorTopPadding, keyboardCursorLeftPadding, "%c", keyboardCursorChar);
+			}
+
 			mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
 			switch(chosenDifficulty)
 			{
@@ -773,7 +841,7 @@ int main()
 				continue;
 			}
 
-			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK)
+			if((input == KEY_MOUSE && getmouse(&mouseEvent) == OK))
 			{
 				clickedY = mouseEvent.y - boardTopPadding;
 				clickedX = mouseEvent.x - boardLeftPadding;
@@ -833,19 +901,6 @@ int main()
 								gameOver = true;
 							}
 						}
-
-						if(gameOver)
-						{
-							//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-							mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
-							drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-							mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
-							mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
-							mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| press 'r' to restart             |");
-							mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| press '1' to reveal all mines    |");
-							mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
-							mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
-						}
 					}
 				}
 
@@ -863,8 +918,165 @@ int main()
 			} else
 			{
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
+				if(input >= '0' && input <= '9')
+				{
+					keyboardCursorJumpValueMultiplierThisFrame *= 10;
+					keyboardCursorJumpValueMultiplierThisFrame += (input - '0');
+				} else
+				{
+					switch(input)
+					{
+						case ' ':
+						{
+							if(haveNotInitializedMinesYet)
+							{
+								Mines::initializeMines(board, keyboardCursorY, keyboardCursorX, chosenDifficultyBoardMines, boardCharSet);
+								Mines::initializeNumbers(board, boardCharSet);
+								haveNotInitializedMinesYet = false;
+							}
+
+							if(board[keyboardCursorY][keyboardCursorX].displayChar == board[keyboardCursorY][keyboardCursorX].actualChar
+							&& board[keyboardCursorY][keyboardCursorX].actualChar >= '0' && board[keyboardCursorY][keyboardCursorX].actualChar <= '9')
+							{
+								if(Mines::numberOfFlagsAroundNumberCellMatch(board, keyboardCursorY, keyboardCursorX, boardCharSet))
+								{
+									if(!Mines::clearBoardWhereClickedAroundNumberCell(board, keyboardCursorY, keyboardCursorX, boardCharSet))
+									{
+										gameOver = true;
+									}
+								}
+							} else
+							{
+								if(!Mines::clearBoardWhereClicked(board, keyboardCursorY, keyboardCursorX, boardCharSet))
+								{
+									gameOver = true;
+								}
+							}
+							break;
+						}
+
+						case 'f':
+						{
+							Mines::flagBoardWhereClicked(board, keyboardCursorY, keyboardCursorX, boardCharSet);
+							break;
+						}
+
+						case 's':
+						{
+							showKeyboardCursor ? showKeyboardCursor = false : showKeyboardCursor = true;
+							break;
+						}
+
+						case 'b':
+						{
+							allowKeyboardCursorBlink ? allowKeyboardCursorBlink = false : allowKeyboardCursorBlink = true;
+							break;
+						}
+
+						case 'h':
+						{
+							if(keyboardCursorJumpValueMultiplierThisFrame == 0)
+							{
+								keyboardCursorX--;
+							} else
+							{
+								keyboardCursorX -= keyboardCursorJumpValueMultiplierThisFrame;
+								keyboardCursorJumpValueMultiplierThisFrame = 0;
+							}
+							break;
+						}
+						case 'j':
+						{
+							if(keyboardCursorJumpValueMultiplierThisFrame == 0)
+							{
+								keyboardCursorY++;
+							} else
+							{
+								keyboardCursorY += keyboardCursorJumpValueMultiplierThisFrame;
+								keyboardCursorJumpValueMultiplierThisFrame = 0;
+							}
+							break;
+						}
+						case 'k':
+						{
+							if(keyboardCursorJumpValueMultiplierThisFrame == 0)
+							{
+								keyboardCursorY--;
+							} else
+							{
+								keyboardCursorY -= keyboardCursorJumpValueMultiplierThisFrame;
+								keyboardCursorJumpValueMultiplierThisFrame = 0;
+							}
+							break;
+						}
+						case 'l':
+						{
+							if(keyboardCursorJumpValueMultiplierThisFrame == 0)
+							{
+								keyboardCursorX++;
+							} else
+							{
+								keyboardCursorX += keyboardCursorJumpValueMultiplierThisFrame;
+								keyboardCursorJumpValueMultiplierThisFrame = 0;
+							}
+							break;
+						}
+					}
+				}
+
+				if(keyboardCursorY >= chosenDifficultyBoardHeight)
+				{
+					if(allowKeyboardCursorWrapAroundBoard)
+					{
+						keyboardCursorY = 0;
+					} else
+					{
+						keyboardCursorY = chosenDifficultyBoardHeight - 1;
+					}
+				} else if(keyboardCursorY < 0)
+				{
+					if(allowKeyboardCursorWrapAroundBoard)
+					{
+						keyboardCursorY = chosenDifficultyBoardHeight - 1;
+					} else
+					{
+						keyboardCursorY = 0;
+					}
+				} else if(keyboardCursorX >= chosenDifficultyBoardWidth)
+				{
+					if(allowKeyboardCursorWrapAroundBoard)
+					{
+						keyboardCursorX = 0;
+					} else
+					{
+						keyboardCursorX = chosenDifficultyBoardWidth - 1;
+					}
+				} else if(keyboardCursorX < 0)
+				{
+					if(allowKeyboardCursorWrapAroundBoard)
+					{
+						keyboardCursorX = chosenDifficultyBoardWidth - 1;
+					} else
+					{
+						keyboardCursorX = 0;
+					}
+				}
 			}
 
+			if(gameOver)
+			{
+				allowKeyboardCursorBlink = true;
+
+				//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+				mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
+				mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
+				mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| press 'r' to restart             |");
+				mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| press '1' to reveal all mines    |");
+				mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
+				mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
+			}
 			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
 			{
 				gameWon = true;
@@ -881,6 +1093,7 @@ int main()
 			gameOver = false;
 			gameWon = false;
 			savedPlayerScore = false;
+			keyboardCursorJumpValueMultiplierThisFrame = 0;
 
 			startMenu = true;
 			haveNotInitializedMinesYet = true;
