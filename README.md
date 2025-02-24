@@ -2,11 +2,28 @@
 
 > A minesweeper clone with an ncurses UI that runs in the terminal
 
-> Note that this is meant to be played with the mouse (even though it's run in the terminal)
+> can play with either mouse or keyboard
 
 ### Controls
 
-Please use the mouse use. Keyboard support isn't fully implemented
+| mouse | action |
+| --- | --- |
+| LMB | clear under mouseCursor |
+| RMB | flag under mouseCursor |
+| Hold-LMB | flag under mouseCursor |
+
+| keyboard | action |
+| --- | --- |
+| q | quit at any-point |
+| SPACE | clear under keyboardCursor |
+| f | flag under keyboardCursor |
+| h | keyboardCursor left |
+| j | keyboardCursor down |
+| k | keyboardCursor up |
+| l | keyboardCursor right |
+| 0-9 | repeat keyboardCursor action *n* times |
+| b | toogle keyboardCursor blink |
+| s | toggle keyboardCursor show |
 
 # Please view only
 
