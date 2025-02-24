@@ -19,6 +19,7 @@
 #define CUSTOM_COLOR_EIGHT 28
 #define CUSTOM_COLOR_NINE 29
 #define CUSTOM_COLOR_TEN 30
+#define CUSTOM_COLOR_ELEVEN 31
 
 /*
 init_color(COLOR_RED, 700, 0, 0);
@@ -39,7 +40,7 @@ void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board
 				attron(COLOR_PAIR(board[y][x].displayChar - '0'));
 				mvwprintw(window, y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
 				attroff(COLOR_PAIR(board[y][x].displayChar - '0'));
-			} else if(board[y][x].displayChar !=  boardCharSet.blankChar)
+			} else if(board[y][x].displayChar != boardCharSet.blankChar)
 			{
 				attron(COLOR_PAIR(9));
 				mvwprintw(window, y + boardTopPadding, x + boardLeftPadding, "%c", board[y][x].displayChar);
@@ -118,11 +119,12 @@ int main()
 	init_color(CUSTOM_COLOR_SIX, 0, 507, 515);
 	init_color(CUSTOM_COLOR_SEVEN, 515, 0, 515);
 	init_color(CUSTOM_COLOR_EIGHT, 457, 457, 457);
-	init_color(CUSTOM_COLOR_NINE, 738, 738, 738);
-	init_color(CUSTOM_COLOR_TEN, 300, 300, 300);
+	init_color(CUSTOM_COLOR_NINE, 738, 738, 738); //non-number and non-blankchar char foreground color
+	init_color(CUSTOM_COLOR_TEN, 600, 300, 300); //keyboardCursor foreground color
+	init_color(CUSTOM_COLOR_ELEVEN, 300, 300, 300);
 
 	const int backgroundColorWhite = COLOR_WHITE;
-	const int backgroundColorGray = CUSTOM_COLOR_TEN;
+	const int backgroundColorGray = CUSTOM_COLOR_ELEVEN;
 	const int backgroundColorBlack = COLOR_BLACK;
 	const int backgroundColorTransparent = -1; 
 	//int backgroundColor = backgroundColorGray;
@@ -175,11 +177,6 @@ int main()
 	const std::string playerScoresSaveFilePath = "dat/playerScores.txt";
 	std::vector<PlayerScore> playerScores;
 	loadPlayerScores(playerScoresSaveFilePath, playerScores);
-	clear();
-	for(int x = 0; x < playerScores.size(); x++)
-	{
-		mvprintw(x, 0, "N: %s, D: %d, S: %f", playerScores[x].playerName.c_str(), playerScores[x].difficulty, playerScores[x].score);
-	}
 
 	const std::string playerNameSaveFilePath = "dat/playerName.txt";
 	std::string playerName = "player0";
@@ -187,6 +184,7 @@ int main()
 
 	bool allowKeyboardCursorBlink = false;
 	bool allowKeyboardCursorWrapAroundBoard = true;
+	bool allowRainbowKeyboardCursor = true;
 	bool allowLeftButtonDownToFlag = true;
 	int mouseLeftButtonDownToFlagThresholdInTenthsOfSeconds = 2;
 
@@ -252,6 +250,9 @@ int main()
 	int keyboardCursorJumpValueMultiplierThisFrame = 0;
 	int keyboardCursorY = 0;
 	int keyboardCursorX = 0;
+	int keyboardCursorR = 999;
+	int keyboardCursorG = 0;
+	int keyboardCursorB = 0;
 	const char keyboardCursorChar = '+';
 	bool showKeyboardCursor = true;
 	
@@ -265,8 +266,8 @@ int main()
 	std::vector<std::vector<Mines::BoardCell>> board;
 	bool haveNotInitializedMinesYet = true;
 
-	std::chrono::time_point<std::chrono::system_clock> gameStartTime;
-	std::chrono::time_point<std::chrono::system_clock> gameEndTime;
+	std::chrono::time_point<std::chrono::system_clock> gameStartTime = std::chrono::high_resolution_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> gameEndTime = gameStartTime;
 	std::chrono::duration<double> gameTimeElapsed;
 
 	int screenHeight = 0;
@@ -279,7 +280,6 @@ int main()
 	bool startMenu = true;
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
-	bool pauseMenu = false;
 	bool gameplayMenu = false;
 	while(true)
 	{
@@ -718,16 +718,15 @@ int main()
 			{
 				Mines::healBoard(changeColorsMenuSampleBoard, boardCharSet);
 			}
-		} else if(pauseMenu)
-		{
-
 		} else if(gameplayMenu)
 		{
 			if(!gameOver && !gameWon)
 			{
 				gameEndTime = std::chrono::high_resolution_clock::now();
 				gameTimeElapsed = gameEndTime - gameStartTime;
-			} else if(gameWon && !savedPlayerScore)
+			}
+
+			if(gameWon && !savedPlayerScore)
 			{
 				playerScores.push_back(PlayerScore(playerName, chosenDifficulty, gameTimeElapsed.count()));
 				sortPlayerScores(playerScores);
@@ -772,6 +771,33 @@ int main()
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 			drawBoardNumbers(stdscr, boardTopPadding, boardLeftPadding, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth);
 
+
+			if(allowRainbowKeyboardCursor && showKeyboardCursor)
+			{
+				if(keyboardCursorR == 999 && keyboardCursorG < 999 && keyboardCursorB == 0)
+				{
+					keyboardCursorG++;
+				} else if(keyboardCursorG == 999 && keyboardCursorR > 0)
+				{
+					keyboardCursorR--;
+				} else if(keyboardCursorG == 999 && keyboardCursorB < 999)
+				{
+					keyboardCursorB++;
+				} else if(keyboardCursorB == 999 && keyboardCursorG > 0)
+				{
+					keyboardCursorG--;
+				} else if(keyboardCursorB == 999 && keyboardCursorR < 999)
+				{
+					keyboardCursorR++;
+				} else if(keyboardCursorR == 999 && keyboardCursorB > 0)
+				{
+					keyboardCursorB--;
+				}
+				init_color(CUSTOM_COLOR_TEN, keyboardCursorR, keyboardCursorG, keyboardCursorB);
+				init_pair(10, CUSTOM_COLOR_TEN, backgroundColor);
+			}
+			attron(COLOR_PAIR(10));
+			attron(A_BOLD);
 			if(allowKeyboardCursorBlink)
 			{
 				if(keyboardCursorBlinkTimeElapsed.count() >= keyboardCursorBlinkSecondThreshold)
@@ -787,6 +813,8 @@ int main()
 			{
 				mvprintw(keyboardCursorTopPadding, keyboardCursorLeftPadding, "%c", keyboardCursorChar);
 			}
+			attroff(A_BOLD);
+			attroff(COLOR_PAIR(10));
 
 			mvprintw(chosenDifficultyInformationTopPadding, chosenDifficultyInformationLeftPadding, "Chosen Difficulty: ");
 			switch(chosenDifficulty)
