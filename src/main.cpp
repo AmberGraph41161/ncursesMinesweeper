@@ -809,7 +809,7 @@ int main()
 				}
 				keyboardCursorBlinkEnd = std::chrono::high_resolution_clock::now();
 				keyboardCursorBlinkTimeElapsed = keyboardCursorBlinkEnd - keyboardCursorBlinkStart;
-			} else if(showKeyboardCursor)
+			} else if(showKeyboardCursor && !gameOver)
 			{
 				mvprintw(keyboardCursorTopPadding, keyboardCursorLeftPadding, "%c", keyboardCursorChar);
 			}
@@ -1098,8 +1098,6 @@ int main()
 
 			if(gameOver)
 			{
-				allowKeyboardCursorBlink = true;
-
 				//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
