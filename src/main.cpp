@@ -281,9 +281,39 @@ int main()
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
 	bool gameplayMenu = false;
+	bool areYouSureYouWantToQuitMenu = false;
 	while(true)
 	{
-		if(startMenu)
+		if(areYouSureYouWantToQuitMenu)
+		{
+			if(gameplayMenu)
+			{
+				nodelay(stdscr, FALSE);
+			}
+
+			getmaxyx(stdscr, screenHeight, screenWidth);
+			clear();
+			const std::string areYouSureYouWantToQuitMenuMessage0 = "ARE YOU SURE YOU WANT TO QUIT?";
+			const std::string areYouSureYouWantToQuitMenuMessage1 = "press 'q' again to quit";
+			const std::string areYouSureYouWantToQuitMenuMessage2 = "press any other key to go back";
+			mvprintw((screenHeight / 2) - 1, (screenWidth / 2) - (areYouSureYouWantToQuitMenuMessage0.size() / 2), "%s", areYouSureYouWantToQuitMenuMessage0.c_str());
+			mvprintw((screenHeight / 2), (screenWidth / 2) - (areYouSureYouWantToQuitMenuMessage1.size() / 2), "%s", areYouSureYouWantToQuitMenuMessage1.c_str());
+			mvprintw((screenHeight / 2) + 1, (screenWidth / 2) - (areYouSureYouWantToQuitMenuMessage2.size() / 2), "%s", areYouSureYouWantToQuitMenuMessage2.c_str());
+			input = getch();
+			clear();
+
+			if(input == 'q')
+			{
+				break;
+			}
+
+			if(gameplayMenu)
+			{
+				nodelay(stdscr, TRUE);
+			}
+			areYouSureYouWantToQuitMenu = false;
+			continue;
+		} else if(startMenu)
 		{
 			clear();
 			mvprintw(0, 0, "Choose Difficulty (press number keys on keyboard)");
@@ -307,9 +337,10 @@ int main()
 			attroff(COLOR_PAIR(5));
 
 			input = getch();
-			if(input == 'q' || input == '`')
+			if(input == 'q')
 			{
-				break;
+				areYouSureYouWantToQuitMenu = true;
+				continue;
 			}
 			clear();
 
@@ -425,9 +456,10 @@ int main()
 			}
 
 			input = getch();
-			if(input == 'q' || input == '`')
+			if(input == 'q')
 			{
-				break;
+				areYouSureYouWantToQuitMenu = true;
+				continue;
 			}
 
 			if(input == '\\') 
@@ -561,9 +593,10 @@ int main()
 			{
 				continue;
 			}
-			if(input == 'q' || input == '`')
+			if(input == 'q')
 			{
-				break;
+				areYouSureYouWantToQuitMenu = true;
+				continue;
 			}
 
 			if(input == '\\')
@@ -861,9 +894,10 @@ int main()
 				continue;
 			}
 
-			if(input == 'q' || input == '`')
+			if(input == 'q')
 			{
-				break;
+				areYouSureYouWantToQuitMenu = true;
+				continue;
 			}
 
 			if(gameOver || gameWon)
