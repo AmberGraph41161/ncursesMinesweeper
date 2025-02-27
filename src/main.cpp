@@ -847,6 +847,14 @@ int main()
 			}
 			mvprintw(gameTimeElapsedInformationTopPadding, gameTimeElapsedInformationLeftPadding, "Elapsed Time: %f", gameTimeElapsed.count());
 
+			if(keyboardCursorJumpValueMultiplierThisFrame)
+			{
+				mvprintw(0, 0, "%d", keyboardCursorJumpValueMultiplierThisFrame);
+			} else
+			{
+				mvprintw(0, 0, "   ");
+			}
+
 			input = getch();
 			if(input == ERR)
 			{
@@ -953,8 +961,11 @@ int main()
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
 				if(input >= '0' && input <= '9')
 				{
-					keyboardCursorJumpValueMultiplierThisFrame *= 10;
-					keyboardCursorJumpValueMultiplierThisFrame += (input - '0');
+					if(keyboardCursorJumpValueMultiplierThisFrame * 10 < 999)
+					{
+						keyboardCursorJumpValueMultiplierThisFrame *= 10;
+						keyboardCursorJumpValueMultiplierThisFrame += (input - '0');
+					}
 				} else
 				{
 					switch(input)
@@ -1061,7 +1072,7 @@ int main()
 				{
 					if(allowKeyboardCursorWrapAroundBoard)
 					{
-						keyboardCursorY = 0;
+						keyboardCursorY = keyboardCursorY % chosenDifficultyBoardHeight;
 					} else
 					{
 						keyboardCursorY = chosenDifficultyBoardHeight - 1;
@@ -1070,7 +1081,7 @@ int main()
 				{
 					if(allowKeyboardCursorWrapAroundBoard)
 					{
-						keyboardCursorY = chosenDifficultyBoardHeight - 1;
+						keyboardCursorY = chosenDifficultyBoardHeight + (keyboardCursorY % chosenDifficultyBoardHeight);
 					} else
 					{
 						keyboardCursorY = 0;
@@ -1079,7 +1090,7 @@ int main()
 				{
 					if(allowKeyboardCursorWrapAroundBoard)
 					{
-						keyboardCursorX = 0;
+						keyboardCursorX = keyboardCursorX % chosenDifficultyBoardWidth;
 					} else
 					{
 						keyboardCursorX = chosenDifficultyBoardWidth - 1;
@@ -1088,7 +1099,7 @@ int main()
 				{
 					if(allowKeyboardCursorWrapAroundBoard)
 					{
-						keyboardCursorX = chosenDifficultyBoardWidth - 1;
+						keyboardCursorX = chosenDifficultyBoardWidth + (keyboardCursorX % chosenDifficultyBoardWidth);
 					} else
 					{
 						keyboardCursorX = 0;
