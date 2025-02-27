@@ -282,6 +282,7 @@ int main()
 	bool changeColorsMenu = false;
 	bool gameplayMenu = false;
 	bool areYouSureYouWantToQuitMenu = false;
+	bool pressedQOnceToQuitCurrentGame = false;
 	while(true)
 	{
 		if(areYouSureYouWantToQuitMenu)
@@ -341,6 +342,9 @@ int main()
 			{
 				areYouSureYouWantToQuitMenu = true;
 				continue;
+			} else if(input == '~')
+			{
+				break;
 			}
 			clear();
 
@@ -428,7 +432,7 @@ int main()
 		{
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			attron(COLOR_PAIR(6));
-			mvprintw(0, 0, "[press '\\' to go back] ");
+			mvprintw(0, 0, "[press 'q' to go back] ");
 			attroff(COLOR_PAIR(6));
 			attron(COLOR_PAIR(1));
 			printw("[screenHeight: %05d, screenWidth: %05d]", screenHeight, screenWidth);
@@ -458,16 +462,13 @@ int main()
 			input = getch();
 			if(input == 'q')
 			{
-				areYouSureYouWantToQuitMenu = true;
-				continue;
-			}
-
-			if(input == '\\') 
-			{
 				chosenDifficulty = -1;
 				customBoardMenu = false;
 				startMenu = true;
 				continue;
+			} else if(input == '~')
+			{
+				break;
 			}
 
 			if(input == 'r'
@@ -567,7 +568,7 @@ int main()
 			init_pair(8, CUSTOM_COLOR_EIGHT, backgroundColor);
 
 			attron(COLOR_PAIR(6));
-			mvprintw(0, 0, "changeColorsMenu [hit '\\' to go back]");
+			mvprintw(0, 0, "changeColorsMenu [hit 'q' to go back]");
 			attroff(COLOR_PAIR(6));
 			mvprintw(1, 0, "press '!' to reveal all mines");
 			mvprintw(2, 0, "press '@' to reveal entire board");
@@ -593,19 +594,17 @@ int main()
 			{
 				continue;
 			}
-			if(input == 'q')
-			{
-				areYouSureYouWantToQuitMenu = true;
-				continue;
-			}
 
-			if(input == '\\')
+			if(input == 'q')
 			{
 				chosenDifficulty = -1;
 				changeColorsMenu = false;
 				startMenu = true;
 				board.clear();
 				continue;
+			} else if(input == '~')
+			{
+				break;
 			}
 
 			if(input == 'D')
@@ -804,7 +803,6 @@ int main()
 			drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
 			drawBoardNumbers(stdscr, boardTopPadding, boardLeftPadding, chosenDifficultyBoardHeight, chosenDifficultyBoardWidth);
 
-
 			if(allowRainbowKeyboardCursor && showKeyboardCursor)
 			{
 				if(keyboardCursorR == 999 && keyboardCursorG < 999 && keyboardCursorB == 0)
@@ -887,17 +885,61 @@ int main()
 			{
 				mvprintw(0, 0, "   ");
 			}
+			if(pressedQOnceToQuitCurrentGame)
+			{
+				mvprintw(1, 0, "press 'q' again to quit current game");
+			} else
+			{
+				mvprintw(1, 0, "                                    ");
+			}
+
+			if(gameOver)
+			{
+				//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
+				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+				mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
+				mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
+				mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| press 'r' to restart             |");
+				mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| press '1' to reveal all mines    |");
+				mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
+				mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
+			}
+			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
+			{
+				gameWon = true;
+				nodelay(stdscr, FALSE);
+				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[8].c_str());
+				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
+				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
+				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
+				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| press 'r' to play again! |");
+				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+--------------------------+");
+			}
 
 			input = getch();
 			if(input == ERR)
 			{
 				continue;
 			}
+			if(input == '~')
+			{
+				break;
+			}
 
 			if(input == 'q')
 			{
-				areYouSureYouWantToQuitMenu = true;
-				continue;
+				if(pressedQOnceToQuitCurrentGame)
+				{
+					pressedQOnceToQuitCurrentGame = false;
+					gameplayMenu = false;
+				} else
+				{
+					pressedQOnceToQuitCurrentGame = true;
+				}
+			} else
+			{
+				pressedQOnceToQuitCurrentGame = false;
 			}
 
 			if(gameOver || gameWon)
@@ -967,6 +1009,7 @@ int main()
 								if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
 								{
 									gameOver = true;
+									nodelay(stdscr, FALSE);
 								}
 							}
 						} else
@@ -974,6 +1017,7 @@ int main()
 							if(!Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet))
 							{
 								gameOver = true;
+								nodelay(stdscr, FALSE);
 							}
 						}
 					}
@@ -1140,29 +1184,6 @@ int main()
 					}
 				}
 			}
-
-			if(gameOver)
-			{
-				//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
-				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
-				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-				mvprintw(gameOverInformationTopPadding + 0, gameOverInformationLeftPadding, "+=================================+");
-				mvprintw(gameOverInformationTopPadding + 1, gameOverInformationLeftPadding, "|            game over!            |");
-				mvprintw(gameOverInformationTopPadding + 2, gameOverInformationLeftPadding, "| press 'r' to restart             |");
-				mvprintw(gameOverInformationTopPadding + 3, gameOverInformationLeftPadding, "| press '1' to reveal all mines    |");
-				mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
-				mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
-			}
-			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
-			{
-				gameWon = true;
-				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[8].c_str());
-				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
-				mvprintw(gameWonInformationTopPadding + 0, gameWonInformationLeftPadding, "+==========================+");
-				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
-				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| press 'r' to play again! |");
-				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+--------------------------+");
-			}
 		} else
 		{
 			//reset game here
@@ -1174,14 +1195,9 @@ int main()
 			startMenu = true;
 			haveNotInitializedMinesYet = true;
 			initialSmileyFacesHasBeenPrinted = false;
-			
-			//customBoardMenu = false;
-			//pauseMenu = false;
-			//gameplayMenu = false;
 
 			board.clear();
 			nodelay(stdscr, FALSE);
-			raw(); //calling this too just in case...? might be unnecessary
 		}
 	}
 

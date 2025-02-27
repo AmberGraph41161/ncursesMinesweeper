@@ -14,14 +14,15 @@
 
 | keyboard | action |
 | --- | --- |
-| q | quit at any-point |
+| ~ | quit at any-point |
+| q | go back to previous screen / quit current game |
 | SPACE | clear under keyboardCursor |
 | f | flag under keyboardCursor |
 | h | keyboardCursor left |
 | j | keyboardCursor down |
 | k | keyboardCursor up |
 | l | keyboardCursor right |
-| 0-9 | repeat keyboardCursor action *n* times |
+| 0-9 | repeat keyboardCursor move action *n* times |
 | b | toogle keyboardCursor blink |
 | s | toggle keyboardCursor show |
 
