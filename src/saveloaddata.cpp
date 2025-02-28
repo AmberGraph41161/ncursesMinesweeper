@@ -157,13 +157,9 @@ bool loadPlayerName(const std::string &filePath, std::string &playerName)
 	std::getline(read, getlinestring);
 	if(!playerNameIsOkay(getlinestring))
 	{
-		for(int x = 0; x < getlinestring.size(); x++)
+		if(getlinestring.find(SAVELOADDATATOKENDELIM) != std::string::npos)
 		{
-			if(getlinestring[x] == SAVELOADDATATOKENDELIM)
-			{
-				getlinestring.erase(getlinestring.begin() + x);
-				x--;
-			}
+			getlinestring.erase(getlinestring.begin() + getlinestring.find(SAVELOADDATATOKENDELIM));
 		}
 	}
 
