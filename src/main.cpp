@@ -283,6 +283,7 @@ int main()
 	bool gameplayMenu = false;
 	bool areYouSureYouWantToQuitMenu = false;
 	bool pressedQOnceToQuitCurrentGame = false;
+
 	while(true)
 	{
 		if(areYouSureYouWantToQuitMenu)
@@ -895,6 +896,7 @@ int main()
 
 			if(gameOver)
 			{
+				nodelay(stdscr, FALSE);
 				//hit a mine, so failed game logic goes here Thursday, January 30, 2025, 00:30:26
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[5].c_str());
 				drawBoard(stdscr, board, boardTopPadding, boardLeftPadding, boardCharSet);
@@ -1009,7 +1011,6 @@ int main()
 								if(!Mines::clearBoardWhereClickedAroundNumberCell(board, clickedY, clickedX, boardCharSet))
 								{
 									gameOver = true;
-									nodelay(stdscr, FALSE);
 								}
 							}
 						} else
@@ -1017,7 +1018,6 @@ int main()
 							if(!Mines::clearBoardWhereClicked(board, clickedY, clickedX, boardCharSet))
 							{
 								gameOver = true;
-								nodelay(stdscr, FALSE);
 							}
 						}
 					}
