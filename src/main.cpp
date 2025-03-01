@@ -178,7 +178,7 @@ int main()
 	std::vector<PlayerScore> playerScores;
 	loadPlayerScores(playerScoresSaveFilePath, playerScores);
 
-	const int playerNameSizeLimit = 40;
+	const int playerNameSizeLimit = 20;
 	const std::string playerNameSaveFilePath = "dat/playerName.txt";
 	std::string playerName = "player0";
 	loadPlayerName(playerNameSaveFilePath, playerName);
@@ -284,6 +284,7 @@ int main()
 
 	bool areYouSureYouWantToQuitMenu = false;
 	bool startMenu = true;
+	bool viewPlayerScoresMenu = false;
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
 	bool changePlayerNameMenu = false;
@@ -345,6 +346,9 @@ int main()
 			mvprintw(7, 0, "7. changePlayerName");
 			mvprintw(8, 0, "+--> playerName: %s", playerName.c_str());
 			attroff(COLOR_PAIR(4));
+			attron(COLOR_PAIR(8));
+			mvprintw(9, 0, "8. viewPlayerScoresMenu");
+			attroff(COLOR_PAIR(8));
 
 			input = getch();
 			if(input == 'q')
@@ -401,6 +405,12 @@ int main()
 					chosenDifficulty = -1;
 					break;
 
+				case '8':
+					startMenu = false;
+					viewPlayerScoresMenu = true;
+					chosenDifficulty = -1;
+					break;
+
 				default:
 					chosenDifficultyBoardHeight = 0;
 					chosenDifficultyBoardWidth = 0;
@@ -434,6 +444,54 @@ int main()
 				gameplayMenu = true;
 				gameStartTime = std::chrono::high_resolution_clock::now();
 				nodelay(stdscr, TRUE);
+			}
+		} else if(viewPlayerScoresMenu)
+		{
+			clear();
+			attron(COLOR_PAIR(6));
+			mvprintw(0, 0, "[press 'q' to go back] ");
+			attroff(COLOR_PAIR(6));
+
+			const std::string playerScoresOutputFormat = "NAME: %-" + std::to_string(playerNameSizeLimit + 2) + "s DIFFICULTY: %-7s TIME: %f";
+
+			for(int x = 0; x < playerScores.size(); x++)
+			{
+				std::string difficulty;
+				switch(playerScores[x].difficulty)
+				{
+					case easyBoardDifficulty:
+						difficulty = "easy";
+						break;
+					case mediumBoardDifficulty:
+						difficulty = "medium";
+						break;
+					case hardBoardDifficulty:
+						difficulty = "hard";
+						break;
+					case extremeBoardDifficulty:
+						difficulty = "extreme";
+						break;
+					case customBoardDifficulty:
+						difficulty = "custom";
+						break;
+					default:
+						difficulty = "???";
+						break;
+				}
+
+				mvprintw(1 + x, 0, playerScoresOutputFormat.c_str(),
+					playerScores[x].playerName.c_str(), difficulty.c_str(), playerScores[x].score);
+			}
+
+			input = getch();
+			if(input == 'q')
+			{
+				viewPlayerScoresMenu = false;
+				startMenu = true;
+				continue;
+			} else if(input == '~')
+			{
+				break;
 			}
 		} else if(customBoardMenu)
 		{
@@ -797,6 +855,7 @@ int main()
 			{
 				changePlayerNameMenu = false;
 				startMenu = true;
+				continue;
 			} else if(input == '~')
 			{
 				break;
