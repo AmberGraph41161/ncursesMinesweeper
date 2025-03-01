@@ -1,7 +1,9 @@
+#include <ctime>
 #include <iostream>
 #include <chrono>
 #include <vector>
 #include <array>
+#include <ctime>
 
 #include <ncurses.h>
 
@@ -28,6 +30,14 @@ init_color(COLOR_RED, 700, 0, 0);
 
 //do RGB256/256, and get first 3 nums after decimal
 */
+
+std::string getCurrentDate()
+{
+	std::time_t now = std::time(0);
+	std::string returnstring = std::ctime(&now);
+	returnstring.pop_back();
+	return returnstring;
+}
 
 void drawBoard(WINDOW* window, std::vector<std::vector<Mines::BoardCell>> &board, int boardTopPadding, int boardLeftPadding, Mines::BoardCharSet boardCharSet)
 {
@@ -456,8 +466,6 @@ int main()
 			attroff(COLOR_PAIR(6));
 
 			const std::string playerScoresNameOutputFormat = "%-" + std::to_string(playerNameSizeLimit + 1) + "s";
-			const std::string playerScoresDifficultyOutputFormat = "%-34s";
-			const std::string playerScoresTimeOutputFormat = "%f";
 
 			for(int x = 0; x < playerScores.size(); x++)
 			{
@@ -490,9 +498,11 @@ int main()
 				attron(A_BOLD); attron(COLOR_PAIR(8)); mvprintw(1 + x, 0, "NAME:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
 				printw(playerScoresNameOutputFormat.c_str(), playerScores[x].playerName.c_str());
 				attron(A_BOLD); printw(" "); attron(COLOR_PAIR(8)); printw("DIFFICULTY:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
-				printw(playerScoresDifficultyOutputFormat.c_str(), difficulty.c_str());
+				printw("%-34s", difficulty.c_str());
+				attron(A_BOLD); printw(" "); attron(COLOR_PAIR(8)); printw("DATE:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
+				printw("%-24s", playerScores[x].date.c_str());
 				attron(A_BOLD); printw(" "); attron(COLOR_PAIR(8)); printw("TIME:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
-				printw(playerScoresTimeOutputFormat.c_str(), playerScores[x].time);
+				printw("%f", playerScores[x].time);
 			}
 
 			input = getch();
@@ -919,30 +929,6 @@ int main()
 			}
 		} else if(gameplayMenu)
 		{
-			if(!gameOver && !gameWon)
-			{
-				gameEndTime = std::chrono::high_resolution_clock::now();
-				gameTimeElapsed = gameEndTime - gameStartTime;
-			}
-
-			if(gameWon && !savedPlayerScore)
-			{
-				playerScores.push_back(PlayerScore(
-					playerName,
-					chosenDifficulty,
-					chosenDifficultyBoardHeight,
-					chosenDifficultyBoardHeight,
-					chosenDifficultyBoardMines,
-					gameTimeElapsed.count()
-				));
-				sortPlayerScores(playerScores);
-
-				makeSureDatFolderExists();
-				savePlayerScores(playerScoresSaveFilePath, playerScores);
-
-				savedPlayerScore = true;
-			}
-
 			//center information padding
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			if(screenHeight != previousScreenHeight || screenWidth != previousScreenWidth)
@@ -1093,6 +1079,31 @@ int main()
 				mvprintw(gameWonInformationTopPadding + 1, gameWonInformationLeftPadding, "|         you won!         |");
 				mvprintw(gameWonInformationTopPadding + 2, gameWonInformationLeftPadding, "| press 'r' to play again! |");
 				mvprintw(gameWonInformationTopPadding + 3, gameWonInformationLeftPadding, "+--------------------------+");
+			}
+
+			if(!gameOver && !gameWon)
+			{
+				gameEndTime = std::chrono::high_resolution_clock::now();
+				gameTimeElapsed = gameEndTime - gameStartTime;
+			}
+
+			if(gameWon && !savedPlayerScore)
+			{
+				playerScores.push_back(PlayerScore(
+					playerName,
+					chosenDifficulty,
+					chosenDifficultyBoardHeight,
+					chosenDifficultyBoardHeight,
+					chosenDifficultyBoardMines,
+					getCurrentDate(),
+					gameTimeElapsed.count()
+				));
+				sortPlayerScores(playerScores);
+
+				makeSureDatFolderExists();
+				savePlayerScores(playerScoresSaveFilePath, playerScores);
+
+				savedPlayerScore = true;
 			}
 
 			input = getch();

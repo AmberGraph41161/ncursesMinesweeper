@@ -16,13 +16,14 @@ struct Triple
 
 struct PlayerScore
 {
-	PlayerScore(std::string playerName, int difficulty, int height, int width, int mines, double time)
+	PlayerScore(std::string playerName, int difficulty, int height, int width, int mines, std::string date, double time)
 	{
 		this->playerName = playerName;
 		this->difficulty = difficulty;
 		this->height = height;
 		this->width = width;
 		this->mines = mines;
+		this->date = date;
 		this->time = time;
 	}
 
@@ -31,6 +32,7 @@ struct PlayerScore
 	int height;
 	int width;
 	int mines;
+	std::string date;
 	double time;
 };
 

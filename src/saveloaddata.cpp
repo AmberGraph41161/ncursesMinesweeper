@@ -181,6 +181,7 @@ bool savePlayerScores(const std::string &filePath, std::vector<PlayerScore> &pla
 		write << playerScores[x].height << SAVELOADDATATOKENDELIM;
 		write << playerScores[x].width << SAVELOADDATATOKENDELIM;
 		write << playerScores[x].mines << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].date << SAVELOADDATATOKENDELIM;
 		write << playerScores[x].time;
 
 		if(x < playerScores.size() - 1)
@@ -211,12 +212,12 @@ bool loadPlayerScores(const std::string &filePath, std::vector<PlayerScore> &pla
 		while(std::getline(lineEater, getlinestring, SAVELOADDATATOKENDELIM))
 		{
 			tokens.push_back(getlinestring);
-			if(tokens.size() >= 6)
+			if(tokens.size() >= 7)
 			{
 				break;
 			}
 		}
-		while(tokens.size() < 6)
+		while(tokens.size() < 7)
 		{
 			tokens.push_back("?");
 		}
@@ -229,7 +230,8 @@ bool loadPlayerScores(const std::string &filePath, std::vector<PlayerScore> &pla
 				std::stoi(tokens[2]),	//height
 				std::stoi(tokens[3]),	//width
 				std::stoi(tokens[4]),	//mines
-				std::stod(tokens[5])	//time
+				tokens[5],				//date
+				std::stod(tokens[6])	//time
 			));
 		} catch(...)
 		{
