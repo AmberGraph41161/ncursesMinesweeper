@@ -247,6 +247,8 @@ int main()
 	int gameWonInformationLeftPadding = 0;
 	int keyboardCursorTopPadding = 0;
 	int keyboardCursorLeftPadding = 0;
+	int playerNameInformationTopPadding = 0;
+	int playerNameInformationLeftPadding = 0;
 
 	int keyboardCursorJumpValueMultiplierThisFrame = 0;
 	int keyboardCursorY = 0;
@@ -942,12 +944,14 @@ int main()
 			gameTimeElapsedInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 			chosenDifficultyInformationTopPadding = boardTopPadding + 1;
 			chosenDifficultyInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameOverInformationTopPadding = boardTopPadding + 2;
+			gameOverInformationTopPadding = boardTopPadding + 3;
 			gameOverInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
-			gameWonInformationTopPadding = boardTopPadding + 2;
+			gameWonInformationTopPadding = boardTopPadding + 3;
 			gameWonInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 			keyboardCursorTopPadding = boardTopPadding + keyboardCursorY;
 			keyboardCursorLeftPadding = boardLeftPadding + keyboardCursorX;
+			playerNameInformationTopPadding = boardTopPadding + 2;
+			playerNameInformationLeftPadding = chosenDifficultyBoardWidth + boardLeftPadding + 1;
 
 			if(!initialSmileyFacesHasBeenPrinted)
 			{
@@ -1032,6 +1036,7 @@ int main()
 					break;
 			}
 			mvprintw(gameTimeElapsedInformationTopPadding, gameTimeElapsedInformationLeftPadding, "Elapsed Time: %f", gameTimeElapsed.count());
+			mvprintw(playerNameInformationTopPadding, playerNameInformationLeftPadding, "player: %s", playerName.c_str());
 
 			if(keyboardCursorJumpValueMultiplierThisFrame)
 			{
