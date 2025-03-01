@@ -142,7 +142,7 @@ bool savePlayerName(const std::string &filePath, const std::string &playerName)
 	return true;
 }
 
-bool loadPlayerName(const std::string &filePath, std::string &playerName)
+bool loadPlayerName(const std::string &filePath, std::string &playerName, const int playerNameSizeLimit)
 {
 	std::fstream read;
 	read.open(filePath, std::fstream::in);
@@ -161,6 +161,10 @@ bool loadPlayerName(const std::string &filePath, std::string &playerName)
 		{
 			getlinestring.erase(getlinestring.begin() + getlinestring.find(SAVELOADDATATOKENDELIM));
 		}
+	}
+	if(getlinestring.size() > playerNameSizeLimit)
+	{
+		getlinestring = getlinestring.substr(0, playerNameSizeLimit - 1);
 	}
 
 	playerName = getlinestring;

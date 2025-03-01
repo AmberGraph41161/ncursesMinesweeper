@@ -36,7 +36,7 @@ void loadDefaultNumberColors(std::array<Triple, 8> &numberColors);
 
 bool playerNameIsOkay(const std::string &playerName);
 bool savePlayerName(const std::string &filePath, const std::string &playerName);
-bool loadPlayerName(const std::string &filePath, std::string &playerName);
+bool loadPlayerName(const std::string &filePath, std::string &playerName, const int playerNameSizeLimit = 40);
 
 bool savePlayerScores(const std::string &filePath, std::vector<PlayerScore> &playerScores);
 bool loadPlayerScores(const std::string &filePath, std::vector<PlayerScore> &playerScores);

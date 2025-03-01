@@ -178,6 +178,7 @@ int main()
 	std::vector<PlayerScore> playerScores;
 	loadPlayerScores(playerScoresSaveFilePath, playerScores);
 
+	const int playerNameSizeLimit = 40;
 	const std::string playerNameSaveFilePath = "dat/playerName.txt";
 	std::string playerName = "player0";
 	loadPlayerName(playerNameSaveFilePath, playerName);
@@ -274,16 +275,19 @@ int main()
 	int screenWidth = 0;
 	int previousScreenHeight = 0;
 	int previousScreenWidth = 0;
+
 	bool gameOver = false;
 	bool gameWon = false;
 	bool savedPlayerScore = false;
+	bool pressedQOnceToQuitCurrentGame = false;
+	bool changePlayerNameMenuInsertMode = false;
+
+	bool areYouSureYouWantToQuitMenu = false;
 	bool startMenu = true;
 	bool customBoardMenu = false;
 	bool changeColorsMenu = false;
+	bool changePlayerNameMenu = false;
 	bool gameplayMenu = false;
-	bool areYouSureYouWantToQuitMenu = false;
-	bool pressedQOnceToQuitCurrentGame = false;
-
 	while(true)
 	{
 		if(areYouSureYouWantToQuitMenu)
@@ -337,6 +341,10 @@ int main()
 			attron(COLOR_PAIR(5));
 			mvprintw(6, 0, "6. changeColorsMenu");
 			attroff(COLOR_PAIR(5));
+			attron(COLOR_PAIR(4));
+			mvprintw(7, 0, "7. changePlayerName");
+			mvprintw(8, 0, "+--> playerName: %s", playerName.c_str());
+			attroff(COLOR_PAIR(4));
 
 			input = getch();
 			if(input == 'q')
@@ -348,14 +356,6 @@ int main()
 				break;
 			}
 			clear();
-
-			if(input == KEY_MOUSE && getmouse(&mouseEvent) == OK && (mouseEvent.bstate &BUTTON1_PRESSED))
-			{
-				clickedY = mouseEvent.y;
-				clickedX = mouseEvent.x;
-
-				input = clickedY + '0';
-			}
 
 			switch(input)
 			{
@@ -393,6 +393,12 @@ int main()
 
 				case '6':
 					chosenDifficulty = changeColorsDifficulty;
+					break;
+
+				case '7':
+					startMenu = false;
+					changePlayerNameMenu = true;
+					chosenDifficulty = -1;
 					break;
 
 				default:
@@ -623,6 +629,11 @@ int main()
 					mvprintw(13, 0, "saved changes to file \"%s\"!", numberColorsSaveFilePath.c_str());
 				}
 				continue;
+			} else
+			{
+				const std::string tempstring = "saved changes to file \"\"!" + numberColorsSaveFilePath;
+				const std::string tempstringspaces(tempstring.size(), ' ');
+				mvprintw(13, 0, "%s", tempstringspaces.c_str());
 			}
 
 			if(input == 'r')
@@ -750,6 +761,90 @@ int main()
 			} else if(input == '#')
 			{
 				Mines::healBoard(changeColorsMenuSampleBoard, boardCharSet);
+			}
+		} else if(changePlayerNameMenu)
+		{
+			int previousScreenHeight = screenHeight;
+			int previousScreenWidth = screenWidth;
+			getmaxyx(stdscr, screenHeight, screenWidth);
+			if(previousScreenHeight != screenHeight || previousScreenWidth != screenWidth)
+			{
+				clear();
+			}
+
+			if(changePlayerNameMenuInsertMode)
+			{
+				attron(COLOR_PAIR(6));
+				mvprintw(0, 0, "changePlayerNameMenu INSERT MODE [hit ',' to exit INSERT MODE]");
+				attroff(COLOR_PAIR(6));
+				printw("                            ");
+			} else 
+			{
+				attron(COLOR_PAIR(6));
+				mvprintw(0, 0, "changePlayerNameMenu NORMAL MODE [hit 'q' to go back, hit 'i' to start editing playerName]");
+				attroff(COLOR_PAIR(6));
+			}
+			mvprintw(1, 0, "press 'S' to save changes to file %s", numberColorsSaveFilePath.c_str());
+			mvprintw(2, 0, "press 'D' to clear playerName buffer");
+
+			const std::string playerNameSizeLimitSpaces(playerNameSizeLimit, ' ');
+			mvprintw(4, 0, "%s", playerNameSizeLimitSpaces.c_str());
+			mvprintw(4, 0, "%s", playerName.c_str());
+
+			input = getch();
+
+			if(!changePlayerNameMenuInsertMode && input == 'q')
+			{
+				changePlayerNameMenu = false;
+				startMenu = true;
+			} else if(input == '~')
+			{
+				break;
+			}
+
+			const std::string tempstring = "saved changes to file \"\"!" + playerNameSaveFilePath;
+			const std::string tempstringspaces(tempstring.size(), ' ');
+			mvprintw(3, 0, "%s", tempstringspaces.c_str());
+
+			if(!changePlayerNameMenuInsertMode)
+			{
+				if(input == 'i')
+				{
+					changePlayerNameMenuInsertMode = true;
+					continue;
+				}
+
+				if(input == 'S')
+				{
+					makeSureDatFolderExists();
+					if(savePlayerName(playerNameSaveFilePath, playerName))
+					{
+						mvprintw(3, 0, "saved changes to file \"%s\"!", playerNameSaveFilePath.c_str());
+						continue;
+					}
+				}
+
+				if(input == 'D')
+				{
+					playerName.clear();
+					continue;
+				}
+			} else if(input == ',' || input == '\n')
+			{
+				changePlayerNameMenuInsertMode = false;
+				continue;
+			}
+
+			if(changePlayerNameMenuInsertMode)
+			{
+				if(input == KEY_BACKSPACE && playerName.size() > 0)
+				{
+					playerName.pop_back();
+				}
+				if(input >= ' ' && input <= '~' && playerName.size() < playerNameSizeLimit) //32 - 126 inclusive, "typable" ascii range
+				{
+					playerName.push_back(input);
+				}
 			}
 		} else if(gameplayMenu)
 		{
