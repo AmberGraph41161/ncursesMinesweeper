@@ -411,6 +411,7 @@ int main()
 					startMenu = false;
 					viewPlayerScoresMenu = true;
 					chosenDifficulty = -1;
+					sortPlayerScores(playerScores);
 					break;
 
 				default:
@@ -451,10 +452,12 @@ int main()
 		{
 			clear();
 			attron(COLOR_PAIR(6));
-			mvprintw(0, 0, "[press 'q' to go back] ");
+			mvprintw(0, 0, "[press 'q' to go back]");
 			attroff(COLOR_PAIR(6));
 
-			const std::string playerScoresOutputFormat = "NAME: %-" + std::to_string(playerNameSizeLimit + 2) + "s DIFFICULTY: %-7s TIME: %f";
+			const std::string playerScoresNameOutputFormat = "%-" + std::to_string(playerNameSizeLimit + 1) + "s";
+			const std::string playerScoresDifficultyOutputFormat = "%-34s";
+			const std::string playerScoresTimeOutputFormat = "%f";
 
 			for(int x = 0; x < playerScores.size(); x++)
 			{
@@ -474,15 +477,22 @@ int main()
 						difficulty = "extreme";
 						break;
 					case customBoardDifficulty:
-						difficulty = "custom";
+						difficulty = "custom --> h: " +
+							std::to_string(playerScores[x].height) + ", w: " +
+							std::to_string(playerScores[x].width) + ", m: " +
+							std::to_string(playerScores[x].mines);
 						break;
 					default:
 						difficulty = "???";
 						break;
 				}
 
-				mvprintw(1 + x, 0, playerScoresOutputFormat.c_str(),
-					playerScores[x].playerName.c_str(), difficulty.c_str(), playerScores[x].score);
+				attron(A_BOLD); attron(COLOR_PAIR(8)); mvprintw(1 + x, 0, "NAME:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
+				printw(playerScoresNameOutputFormat.c_str(), playerScores[x].playerName.c_str());
+				attron(A_BOLD); printw(" "); attron(COLOR_PAIR(8)); printw("DIFFICULTY:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
+				printw(playerScoresDifficultyOutputFormat.c_str(), difficulty.c_str());
+				attron(A_BOLD); printw(" "); attron(COLOR_PAIR(8)); printw("TIME:"); attroff(COLOR_PAIR(8)); printw(" "); attroff(A_BOLD);
+				printw(playerScoresTimeOutputFormat.c_str(), playerScores[x].time);
 			}
 
 			input = getch();
@@ -499,7 +509,7 @@ int main()
 		{
 			getmaxyx(stdscr, screenHeight, screenWidth);
 			attron(COLOR_PAIR(6));
-			mvprintw(0, 0, "[press 'q' to go back] ");
+			mvprintw(0, 0, "[press 'q' to go back]");
 			attroff(COLOR_PAIR(6));
 			attron(COLOR_PAIR(1));
 			printw("[screenHeight: %05d, screenWidth: %05d]", screenHeight, screenWidth);
@@ -917,7 +927,14 @@ int main()
 
 			if(gameWon && !savedPlayerScore)
 			{
-				playerScores.push_back(PlayerScore(playerName, chosenDifficulty, gameTimeElapsed.count()));
+				playerScores.push_back(PlayerScore(
+					playerName,
+					chosenDifficulty,
+					chosenDifficultyBoardHeight,
+					chosenDifficultyBoardHeight,
+					chosenDifficultyBoardMines,
+					gameTimeElapsed.count()
+				));
 				sortPlayerScores(playerScores);
 
 				makeSureDatFolderExists();

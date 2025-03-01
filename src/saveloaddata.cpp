@@ -178,7 +178,10 @@ bool savePlayerScores(const std::string &filePath, std::vector<PlayerScore> &pla
 	{
 		write << playerScores[x].playerName << SAVELOADDATATOKENDELIM;
 		write << playerScores[x].difficulty << SAVELOADDATATOKENDELIM;
-		write << playerScores[x].score;
+		write << playerScores[x].height << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].width << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].mines << SAVELOADDATATOKENDELIM;
+		write << playerScores[x].time;
 
 		if(x < playerScores.size() - 1)
 		{
@@ -208,19 +211,26 @@ bool loadPlayerScores(const std::string &filePath, std::vector<PlayerScore> &pla
 		while(std::getline(lineEater, getlinestring, SAVELOADDATATOKENDELIM))
 		{
 			tokens.push_back(getlinestring);
-			if(tokens.size() >= 3)
+			if(tokens.size() >= 6)
 			{
 				break;
 			}
 		}
-		while(tokens.size() < 3)
+		while(tokens.size() < 6)
 		{
 			tokens.push_back("?");
 		}
 
 		try
 		{
-			playerScores.push_back(PlayerScore(tokens[0], std::stoi(tokens[1]), std::stod(tokens[2])));
+			playerScores.push_back(PlayerScore(
+				tokens[0],				//name
+				std::stoi(tokens[1]),	//difficulty
+				std::stoi(tokens[2]),	//height
+				std::stoi(tokens[3]),	//width
+				std::stoi(tokens[4]),	//mines
+				std::stod(tokens[5])	//time
+			));
 		} catch(...)
 		{
 			continue;
@@ -236,6 +246,6 @@ void sortPlayerScores(std::vector<PlayerScore> &playerScores)
 	std::sort(playerScores.begin(), playerScores.end(),
 	[](const PlayerScore &left, const PlayerScore &right)
 	{
-		return left.score < right.score;
+		return left.time < right.time;
 	});
 }
