@@ -121,11 +121,6 @@ void loadDefaultNumberColors(std::array<Triple, 8> &numberColors)
 	};
 }
 
-bool playerNameIsOkay(const std::string &playerName)
-{
-	return (playerName.find(SAVELOADDATATOKENDELIM) != std::string::npos);
-}
-
 bool savePlayerName(const std::string &filePath, const std::string &playerName)
 {
 	std::fstream write;
@@ -155,13 +150,11 @@ bool loadPlayerName(const std::string &filePath, std::string &playerName, const 
 
 	std::string getlinestring;
 	std::getline(read, getlinestring);
-	if(!playerNameIsOkay(getlinestring))
+	while(getlinestring.find(SAVELOADDATATOKENDELIM) != std::string::npos)
 	{
-		while(getlinestring.find(SAVELOADDATATOKENDELIM) != std::string::npos)
-		{
-			getlinestring.erase(getlinestring.begin() + getlinestring.find(SAVELOADDATATOKENDELIM));
-		}
+		getlinestring.erase(getlinestring.begin() + getlinestring.find(SAVELOADDATATOKENDELIM));
 	}
+
 	if(getlinestring.size() > playerNameSizeLimit)
 	{
 		getlinestring = getlinestring.substr(0, playerNameSizeLimit - 1);
