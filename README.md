@@ -2,9 +2,24 @@
 
 > A minesweeper clone with an ncurses UI that runs in the terminal
 
-> can play with either mouse or keyboard
+> Can play with either mouse or keyboard
 
-### Controls
+## Gameplay
+
+> keyboard gameplay (cool RAINBOW cursor included!)
+
+![keyboardGameplay](md/keyboardGameplay.gif)
+
+> Mouse gameplay
+
+![mouseGameplay](md/mouseGameplay.gif)
+
+> customBoardMenu, changeColorsMenu, changePlayerNameMenu, viewPlayerScoresMenu
+
+![menu](md/menu.gif)
+
+
+## Gameplay Controls
 
 | mouse | action |
 | --- | --- |
@@ -25,6 +40,43 @@
 | 0-9 | repeat keyboardCursor move action *n* times |
 | b | toogle keyboardCursor blink |
 | s | toggle keyboardCursor show |
+
+# INSTALLATION
+
+> This project uses ncurses
+>  
+> This will not run on non-posix compliant shells
+>  
+> may or may not make a [pdcurses](https://pdcurses.org/) fork in the future (for Windows support)
+
+## Linux
+
+Dependencies:
+
+> make >= 4.4.1
+
+> clang >= 18.1.8 
+
+1. Use your distro's package manager to install ncurses library
+```shell
+# for arch-linux-based-distros:
+pacman -Sy ncurses
+```
+
+2. Clone the repo and cd into it
+```shell
+git clone https://github.com/AmberGraph41161/ncursesMinesweeper && cd ncursesMinesweeper
+```
+
+3. Run provided Makefile to create binary
+```shell
+Make
+```
+
+4. Run the binary file and enjoy!
+```
+./main
+```
 
 # Please view only
 
