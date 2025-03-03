@@ -1388,6 +1388,8 @@ int main()
 			gameWon = false;
 			savedPlayerScore = false;
 			keyboardCursorJumpValueMultiplierThisFrame = 0;
+			keyboardCursorY = 0;
+			keyboardCursorX = 0;
 
 			startMenu = true;
 			haveNotInitializedMinesYet = true;
