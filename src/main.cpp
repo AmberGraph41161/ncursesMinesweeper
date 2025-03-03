@@ -1149,6 +1149,11 @@ int main()
 
 			if((input == KEY_MOUSE && getmouse(&mouseEvent) == OK))
 			{
+				if(showKeyboardCursor)
+				{
+					showKeyboardCursor = false;
+				}
+
 				clickedY = mouseEvent.y - boardTopPadding;
 				clickedX = mouseEvent.x - boardLeftPadding;
 
@@ -1223,6 +1228,11 @@ int main()
 				}
 			} else
 			{
+				if(!showKeyboardCursor)
+				{
+					showKeyboardCursor = true;
+				}
+
 				mvprintw(smileyFaceInformationTopPadding, smileyFaceInformationLeftPadding, "%s", smileyFaces[6].c_str());
 				if(input >= '0' && input <= '9')
 				{
