@@ -12,27 +12,24 @@ namespace Mines
 
 	void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, BoardCharSet &boardCharSet)
 	{
+		BoardCell tempBoardCell;
+		tempBoardCell.actualChar = boardCharSet.blankChar;
+
+		board.clear();
+		board.reserve(boardHeight);
 		for(int y = 0; y < boardHeight; y++)
 		{
-			std::vector<BoardCell> tempRow;
-			for(int x = 0; x < boardWidth; x++)
-			{
-				BoardCell tempBoardCell;
-				tempBoardCell.actualChar = boardCharSet.blankChar;
-				tempRow.push_back(tempBoardCell);
-			}
-			board.push_back(tempRow);
-			tempRow.clear();
+			board.emplace_back(std::vector<BoardCell>(boardWidth, tempBoardCell));
 		}
 	}
-	
+
 	void initializeMines(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, int boardMines, BoardCharSet &boardCharSet, bool keepThreeByThreeSafeSpaceAroundCursor)
 	{
 		for(int x = 0; x < boardMines; x++)
 		{
 			int randomSpotY = RANDOM(0, board.size() - 1);
 			int randomSpotX = RANDOM(0, board[0].size() - 1);
-			
+
 			if(keepThreeByThreeSafeSpaceAroundCursor)
 			{
 				if((randomSpotY >= clickedY - 1 && randomSpotY <= clickedY + 1
@@ -101,7 +98,7 @@ namespace Mines
 		{
 			return true;
 		}
-		
+
 		if(board[clickedY][clickedX].displayChar == board[clickedY][clickedX].actualChar)
 		{
 			return true;
@@ -135,12 +132,12 @@ namespace Mines
 
 	void flagBoardWhereClicked(std::vector<std::vector<BoardCell>> &board, int clickedY, int clickedX, BoardCharSet &boardCharSet)
 	{
-	
+
 		if(clickedY >= board.size() || clickedY < 0 || clickedX >= board[0].size() || clickedX < 0)
 		{
 			return;
 		}
-		
+
 		if(board[clickedY][clickedX].displayChar == boardCharSet.filledChar)
 		{
 			board[clickedY][clickedX].displayChar = boardCharSet.flagChar;
@@ -275,8 +272,6 @@ namespace Mines
 		}
 	}
 
-#include <ncurses.h>
-
 	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
 	{
 		int fakeFlagCount = 0;
@@ -308,4 +303,4 @@ namespace Mines
 		}
 		return false;
 	}
-}
+} //namespace Mines

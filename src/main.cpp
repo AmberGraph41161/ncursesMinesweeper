@@ -268,7 +268,7 @@ int main()
 	int keyboardCursorB = 0;
 	const char keyboardCursorChar = '+';
 	bool showKeyboardCursor = true;
-	
+
 	const double keyboardCursorBlinkFirstThreshold = 0.25;
 	const double keyboardCursorBlinkSecondThreshold = keyboardCursorBlinkFirstThreshold * 2;
 	std::chrono::time_point<std::chrono::system_clock> keyboardCursorBlinkStart = std::chrono::high_resolution_clock::now();
@@ -388,7 +388,7 @@ int main()
 					chosenDifficultyBoardMines = mediumBoardMines;
 					chosenDifficulty = mediumBoardDifficulty;
 					break;
-				
+
 				case '3':
 					chosenDifficultyBoardHeight = hardBoardHeight;
 					chosenDifficultyBoardWidth = hardBoardWidth;
@@ -1089,7 +1089,7 @@ int main()
 
 			if(gameWon && !savedPlayerScore)
 			{
-				playerScores.push_back(PlayerScore(
+				playerScores.emplace_back(PlayerScore(
 					playerName,
 					chosenDifficulty,
 					chosenDifficultyBoardHeight,
