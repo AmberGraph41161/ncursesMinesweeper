@@ -1,9 +1,10 @@
-main
-build/
-dat/
+/main
+/build/
+/dat/
 
-references/
+/references/
 
-pandoc/
-md/forlater/
-README.html
+/pandoc/
+/md/forlater/
+/README.html
+/doxygenOutput/
