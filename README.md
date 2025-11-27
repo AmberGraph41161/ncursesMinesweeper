@@ -1,5 +1,6 @@
 # ncursesMinesweeper
 
+
 > A minesweeper clone with an ncurses UI that runs in the terminal
 
 > Can play with either mouse or keyboard
@@ -76,6 +77,32 @@ Make
 4. Run the binary file and enjoy!
 ```
 ./main
+```
+
+# Documentation
+
+This project makes use of [Doxygen](https://www.doxygen.nl/) to document the
+code behind it. You can generate this documentation by doing to following:
+
+1. To generate the PDF documentation via texlive (LATEX) and Doxygen, first
+   resolve dependencies
+```shell
+pacman -Sy texlive doxygen
+```
+
+2. Run doxygen while in the project root on the provided Doxyfile
+```shell
+doxygen
+```
+
+3. CD into the output directory and run make
+```shell
+cd doxygenOutput/latex/ && make
+```
+
+4. View the newly created refman PDF with your favorite PDF viewer
+```shell
+zathura refman.pdf
 ```
 
 # Please view only
