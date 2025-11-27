@@ -191,7 +191,7 @@ int main()
 	const int playerNameSizeLimit = 20;
 	const std::string playerNameSaveFilePath = "dat/playerName.txt";
 	std::string playerName = "player0";
-	loadPlayerName(playerNameSaveFilePath, playerName);
+	loadPlayerName(playerNameSaveFilePath, playerName, playerNameSizeLimit);
 
 	bool allowKeyboardCursorBlink = false;
 	bool allowKeyboardCursorWrapAroundBoard = true;
@@ -1069,7 +1069,7 @@ int main()
 				mvprintw(gameOverInformationTopPadding + 4, gameOverInformationLeftPadding, "| press '2' to reveal entire board |");
 				mvprintw(gameOverInformationTopPadding + 5, gameOverInformationLeftPadding, "+---------------------------------+");
 			}
-			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, chosenDifficultyBoardMines, boardCharSet))
+			if(!haveNotInitializedMinesYet && !gameOver && Mines::haveFoundAllMines(board, boardCharSet))
 			{
 				gameWon = true;
 				nodelay(stdscr, FALSE);

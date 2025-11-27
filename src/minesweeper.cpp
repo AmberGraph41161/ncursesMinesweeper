@@ -272,7 +272,7 @@ namespace Mines
 		}
 	}
 
-	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet)
+	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet)
 	{
 		int fakeFlagCount = 0;
 		int fakeFilledCharCount = 0;

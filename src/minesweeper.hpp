@@ -145,7 +145,7 @@ namespace Mines
 	 * @param board board on which you wish to use this function
 	 * @param boardCharSet BoardCharSet used for the given board
 	 */
-	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, int chosenDifficultyBoardMines, BoardCharSet &boardCharSet);
+	bool haveFoundAllMines(std::vector<std::vector<BoardCell>> &board, BoardCharSet &boardCharSet);
 }
 
 #endif
