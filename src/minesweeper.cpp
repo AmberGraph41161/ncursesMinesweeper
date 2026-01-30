@@ -1,13 +1,16 @@
 #include "minesweeper.hpp"
 
-#include <cstdlib>
 #include <vector>
+#include <random>
 
 namespace Mines
 {
 	int RANDOM(int minimum, int maximum)
 	{
-		return (rand() % (maximum - minimum + 1)) + minimum;
+		std::random_device randomDevice;
+		std::mt19937 mt(randomDevice());
+		std::uniform_int_distribution<int> dist(minimum, maximum);
+		return dist(mt);
 	}
 
 	void initializeBoard(std::vector<std::vector<BoardCell>> &board, int boardHeight, int boardWidth, BoardCharSet &boardCharSet)
