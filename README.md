@@ -71,7 +71,7 @@ git clone https://github.com/AmberGraph41161/ncursesMinesweeper && cd ncursesMin
 
 3. Run provided Makefile to create binary
 ```shell
-Make
+make
 ```
 
 4. Run the binary file and enjoy!
