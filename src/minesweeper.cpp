@@ -7,8 +7,7 @@ namespace Mines
 {
 	int RANDOM(int minimum, int maximum)
 	{
-		std::random_device randomDevice;
-		std::mt19937 mt(randomDevice());
+		static std::mt19937 mt(std::random_device{}());
 		std::uniform_int_distribution<int> dist(minimum, maximum);
 		return dist(mt);
 	}
